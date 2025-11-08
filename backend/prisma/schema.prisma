@@ -47,6 +47,7 @@ enum PayslipStatus {
 
 enum WageType {
   FIXED
+  HOURLY
 }
 
 enum ComputationType {
@@ -157,6 +158,13 @@ model SalaryStructure {
   wage              Decimal             @db.Decimal(10, 2)
   pfRate            Decimal             @default(12) @db.Decimal(5, 2)
   professionalTax   Decimal             @default(200) @db.Decimal(10, 2)
+  
+  // Overtime settings (for FIXED wage type)
+  standardWorkHoursPerDay   Decimal?    @default(8) @db.Decimal(5, 2)
+  standardWorkDaysPerMonth  Int?        @default(30)
+  overtimeEnabled           Boolean     @default(false)
+  overtimeRate              Decimal?    @db.Decimal(10, 2)
+  
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   
@@ -252,6 +260,12 @@ model Payslip {
   workedDays        Decimal         @db.Decimal(5, 2)
   paidLeaveDays     Decimal         @default(0) @db.Decimal(5, 2)
   unpaidLeaveDays   Decimal         @default(0) @db.Decimal(5, 2)
+  
+  // Hours tracking (for both fixed and hourly)
+  totalHours        Decimal?        @db.Decimal(8, 2)
+  standardHours     Decimal?        @db.Decimal(8, 2)
+  overtimeHours     Decimal?        @default(0) @db.Decimal(8, 2)
+  overtimePay       Decimal?        @default(0) @db.Decimal(10, 2)
   
   // Salary breakdown
   basicWage         Decimal         @db.Decimal(10, 2)
