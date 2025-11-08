@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
-import { Play, Search, AlertCircle, TrendingUp } from 'lucide-react'
+import { Play, Search, AlertCircle, TrendingUp, DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
 
 const Payroll = () => {
@@ -75,6 +75,22 @@ const Payroll = () => {
           <Play className="w-5 h-5" />
           {generating ? 'Generating...' : 'Run Payroll'}
         </button>
+      </div>
+
+      {/* Info Banner - Add Salary Structures */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+        <DollarSign className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+        <div>
+          <h4 className="font-medium text-blue-800">Before Running Payroll</h4>
+          <p className="text-sm text-blue-700">
+            Make sure all employees have their salary structures defined. You can add/edit salary structures from the Employee Details page.
+            {payrollData?.statistics?.totalPayslips === 0 && (
+              <span className="block mt-1 font-medium">
+                → Go to <a href="/employees" className="underline hover:text-blue-900">Employees</a>, select an employee, and click "Add Salary" to get started.
+              </span>
+            )}
+          </p>
+        </div>
       </div>
 
       {/* Warnings */}
