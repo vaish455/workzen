@@ -205,13 +205,16 @@ export const updateEmployee = async (req, res, next) => {
   try {
     const { id } = req.params;
     const currentUser = req.user;
-    const updateData = req.body;
+    let updateData = req.body;
     
     // Check if employee exists in same company
     const employee = await prisma.employee.findFirst({
       where: {
         id,
         companyId: currentUser.companyId,
+      },
+      include: {
+        user: true,
       },
     });
     
@@ -230,11 +233,51 @@ export const updateEmployee = async (req, res, next) => {
       });
     }
     
-    // Remove fields that shouldn't be updated
+    // Remove fields that shouldn't be updated via this endpoint
     delete updateData.userId;
     delete updateData.companyId;
     delete updateData.yearOfJoining;
     delete updateData.serialNumber;
+    delete updateData.user;
+    
+    // Clean up empty dates and convert to proper format
+    if (updateData.dateOfBirth === '' || updateData.dateOfBirth === null) {
+      delete updateData.dateOfBirth;
+    } else if (updateData.dateOfBirth) {
+      // Ensure date is in proper ISO format
+      updateData.dateOfBirth = new Date(updateData.dateOfBirth).toISOString();
+    }
+    
+    // Remove empty strings
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === '') {
+        delete updateData[key];
+      }
+    });
+    
+    // If email is being updated, check if it's already in use
+    if (updateData.email && updateData.email !== employee.email) {
+      const existingEmployee = await prisma.employee.findFirst({
+        where: {
+          email: updateData.email,
+          companyId: currentUser.companyId,
+          NOT: { id },
+        },
+      });
+      
+      if (existingEmployee) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email is already in use by another employee',
+        });
+      }
+      
+      // Also update user email if employee email changes
+      await prisma.user.update({
+        where: { id: employee.userId },
+        data: { email: updateData.email },
+      });
+    }
     
     // Update employee
     const updatedEmployee = await prisma.employee.update({
@@ -247,6 +290,14 @@ export const updateEmployee = async (req, res, next) => {
             loginId: true,
             email: true,
             role: true,
+            isActive: true,
+          },
+        },
+        salaryStructure: {
+          include: {
+            components: {
+              orderBy: { order: 'asc' },
+            },
           },
         },
       },
@@ -258,6 +309,7 @@ export const updateEmployee = async (req, res, next) => {
       data: updatedEmployee,
     });
   } catch (error) {
+    console.error('Update employee error:', error);
     next(error);
   }
 };

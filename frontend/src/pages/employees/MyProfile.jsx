@@ -76,11 +76,25 @@ const MyProfile = () => {
     setLoading(true)
 
     try {
-      const response = await api.put(`/employees/${employee.id}`, profileData)
+      // Clean up the data before sending
+      const cleanedData = { ...profileData }
+      
+      // Remove empty strings
+      Object.keys(cleanedData).forEach(key => {
+        if (cleanedData[key] === '') {
+          delete cleanedData[key]
+        }
+      })
+      
+      const response = await api.put(`/employees/${employee.id}`, cleanedData)
       updateProfile(response.data.data)
       toast.success('Profile updated successfully')
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to update profile')
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.errors?.[0]?.message || 
+                          'Failed to update profile'
+      toast.error(errorMessage)
+      console.error('Update error:', error.response?.data)
     } finally {
       setLoading(false)
     }
@@ -91,11 +105,25 @@ const MyProfile = () => {
     setLoading(true)
 
     try {
-      const response = await api.put(`/employees/${employee.id}`, bankData)
+      // Clean up the data before sending
+      const cleanedData = { ...bankData }
+      
+      // Remove empty strings
+      Object.keys(cleanedData).forEach(key => {
+        if (cleanedData[key] === '') {
+          delete cleanedData[key]
+        }
+      })
+      
+      const response = await api.put(`/employees/${employee.id}`, cleanedData)
       updateProfile(response.data.data)
       toast.success('Bank details updated successfully')
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to update bank details')
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.errors?.[0]?.message || 
+                          'Failed to update bank details'
+      toast.error(errorMessage)
+      console.error('Update error:', error.response?.data)
     } finally {
       setLoading(false)
     }

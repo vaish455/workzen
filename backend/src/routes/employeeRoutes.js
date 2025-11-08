@@ -17,8 +17,15 @@ const router = express.Router();
 // Validation rules
 const updateEmployeeValidation = [
   body('email').optional().isEmail().withMessage('Valid email is required'),
+  body('phone').optional().trim(),
   body('gender').optional().isIn(['MALE', 'FEMALE', 'OTHER']).withMessage('Invalid gender'),
   body('maritalStatus').optional().isIn(['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED']).withMessage('Invalid marital status'),
+  body('dateOfBirth').optional().custom((value) => {
+    if (!value || value === '') return true; // Allow empty
+    // Check if it's a valid date
+    const date = new Date(value);
+    return !isNaN(date.getTime());
+  }).withMessage('Valid date is required'),
 ];
 
 const salaryValidation = [
