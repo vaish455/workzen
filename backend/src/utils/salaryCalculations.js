@@ -115,6 +115,87 @@ export const roundToTwo = (value) => {
 };
 
 /**
+ * Calculate total worked hours from attendance records
+ * @param {Array} attendances - Array of attendance records
+ * @returns {number} - Total hours worked
+ */
+export const calculateTotalWorkedHours = (attendances) => {
+  return attendances.reduce((total, attendance) => {
+    if (attendance.status === 'PRESENT' && attendance.workingHours) {
+      return total + parseFloat(attendance.workingHours);
+    }
+    return total;
+  }, 0);
+};
+
+/**
+ * Calculate overtime hours and pay
+ * @param {number} totalWorkedHours - Total hours worked by employee
+ * @param {number} standardHoursPerDay - Standard work hours per day (e.g., 8)
+ * @param {number} standardDaysPerMonth - Standard work days per month (e.g., 30)
+ * @param {number} overtimeRate - Overtime pay rate per hour
+ * @returns {Object} - { standardHours, overtimeHours, overtimePay }
+ */
+export const calculateOvertime = (totalWorkedHours, standardHoursPerDay = 8, standardDaysPerMonth = 30, overtimeRate = 0) => {
+  const standardHours = parseFloat(standardHoursPerDay) * parseInt(standardDaysPerMonth);
+  const totalHours = parseFloat(totalWorkedHours);
+  
+  let overtimeHours = 0;
+  let overtimePay = 0;
+  
+  if (totalHours > standardHours) {
+    overtimeHours = totalHours - standardHours;
+    overtimePay = overtimeHours * parseFloat(overtimeRate);
+  }
+  
+  return {
+    standardHours: roundToTwo(standardHours),
+    overtimeHours: roundToTwo(overtimeHours),
+    overtimePay: roundToTwo(overtimePay),
+  };
+};
+
+/**
+ * Calculate hourly rate from monthly wage
+ * @param {number} monthlyWage - Monthly fixed wage
+ * @param {number} standardHoursPerDay - Standard work hours per day
+ * @param {number} standardDaysPerMonth - Standard work days per month
+ * @returns {number} - Hourly rate
+ */
+export const calculateHourlyRateFromMonthly = (monthlyWage, standardHoursPerDay = 8, standardDaysPerMonth = 30) => {
+  const standardHours = parseFloat(standardHoursPerDay) * parseInt(standardDaysPerMonth);
+  return parseFloat(monthlyWage) / standardHours;
+};
+
+/**
+ * Calculate hourly-based component amount
+ * @param {Object} component - Salary component
+ * @param {number} hourlyRate - Hourly rate
+ * @param {number} totalHours - Total worked hours
+ * @param {number} basicAmount - Basic salary amount
+ * @returns {number}
+ */
+export const calculateHourlyComponentAmount = (component, hourlyRate, totalHours, basicAmount = 0) => {
+  const { computationType, value } = component;
+  const totalHourlyWage = parseFloat(hourlyRate) * parseFloat(totalHours);
+  
+  switch (computationType) {
+    case 'PERCENTAGE_OF_WAGE':
+      return (totalHourlyWage * parseFloat(value)) / 100;
+    
+    case 'PERCENTAGE_OF_BASIC':
+      return (parseFloat(basicAmount) * parseFloat(value)) / 100;
+    
+    case 'FIXED_AMOUNT':
+      // For hourly, fixed amount is also prorated based on hours worked vs standard hours
+      return parseFloat(value);
+    
+    default:
+      return 0;
+  }
+};
+
+/**
  * Validate salary components total doesn't exceed wage
  * @param {Array} components 
  * @param {number} wage 

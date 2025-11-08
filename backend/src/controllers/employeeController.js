@@ -384,7 +384,17 @@ export const uploadProfilePicture = async (req, res, next) => {
 export const updateSalaryStructure = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { wage, pfRate, professionalTax, components } = req.body;
+    const { 
+      wageType, 
+      wage, 
+      pfRate, 
+      professionalTax, 
+      components,
+      standardWorkHoursPerDay,
+      standardWorkDaysPerMonth,
+      overtimeEnabled,
+      overtimeRate
+    } = req.body;
     const currentUser = req.user;
     
     // Check permissions - only Admin and Payroll Officer
@@ -428,14 +438,24 @@ export const updateSalaryStructure = async (req, res, next) => {
         where: { employeeId: id },
         create: {
           employeeId: id,
+          wageType: wageType || 'FIXED',
           wage: wage,
           pfRate: pfRate || 12,
           professionalTax: professionalTax || 200,
+          standardWorkHoursPerDay: standardWorkHoursPerDay || 8,
+          standardWorkDaysPerMonth: standardWorkDaysPerMonth || 30,
+          overtimeEnabled: overtimeEnabled || false,
+          overtimeRate: overtimeRate || 0,
         },
         update: {
+          wageType: wageType || 'FIXED',
           wage: wage,
           pfRate: pfRate || 12,
           professionalTax: professionalTax || 200,
+          standardWorkHoursPerDay: standardWorkHoursPerDay || 8,
+          standardWorkDaysPerMonth: standardWorkDaysPerMonth || 30,
+          overtimeEnabled: overtimeEnabled || false,
+          overtimeRate: overtimeRate || 0,
         },
       });
       

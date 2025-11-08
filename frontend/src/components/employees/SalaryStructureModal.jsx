@@ -5,13 +5,21 @@ import toast from 'react-hot-toast'
 
 const SalaryStructureModal = ({ isOpen, onClose, employee, onSuccess }) => {
   const [loading, setLoading] = useState(false)
+  const [wageType, setWageType] = useState('FIXED') // 'FIXED' or 'HOURLY'
   const [wage, setWage] = useState('')
   const [pfRate, setPfRate] = useState('12')
   const [professionalTax, setProfessionalTax] = useState('200')
+  
+  // Overtime settings (for FIXED wage type)
+  const [overtimeEnabled, setOvertimeEnabled] = useState(false)
+  const [standardWorkHoursPerDay, setStandardWorkHoursPerDay] = useState('8')
+  const [standardWorkDaysPerMonth, setStandardWorkDaysPerMonth] = useState('30')
+  const [overtimeRate, setOvertimeRate] = useState('0')
+  
   const [components, setComponents] = useState([
     { name: 'Basic', computationType: 'PERCENTAGE_OF_WAGE', value: '50', isBasic: true },
     { name: 'House Rent Allowance', computationType: 'PERCENTAGE_OF_BASIC', value: '50' },
-    { name: 'Standard Allowance', computationType: 'FIXED_AMOUNT', value: '4167' },
+    { name: 'Standard Allowance', computationType: 'FIXED_AMOUNT', value: '0' },
     { name: 'Performance Bonus', computationType: 'PERCENTAGE_OF_WAGE', value: '8.33' },
     { name: 'Leave Travel Allowance', computationType: 'PERCENTAGE_OF_WAGE', value: '8.33' },
   ])
@@ -19,9 +27,14 @@ const SalaryStructureModal = ({ isOpen, onClose, employee, onSuccess }) => {
   useEffect(() => {
     if (isOpen && employee?.salaryStructure) {
       const salary = employee.salaryStructure
+      setWageType(salary.wageType || 'FIXED')
       setWage(salary.wage.toString())
       setPfRate(salary.pfRate?.toString() || '12')
       setProfessionalTax(salary.professionalTax?.toString() || '200')
+      setOvertimeEnabled(salary.overtimeEnabled || false)
+      setStandardWorkHoursPerDay(salary.standardWorkHoursPerDay?.toString() || '8')
+      setStandardWorkDaysPerMonth(salary.standardWorkDaysPerMonth?.toString() || '30')
+      setOvertimeRate(salary.overtimeRate?.toString() || '0')
       
       if (salary.components && salary.components.length > 0) {
         setComponents(salary.components.map(comp => ({
@@ -130,10 +143,15 @@ const SalaryStructureModal = ({ isOpen, onClose, employee, onSuccess }) => {
     }
 
     const salaryData = {
+      wageType,
       wage: wageNum,
       pfRate: parseFloat(pfRate) || 12,
       professionalTax: parseFloat(professionalTax) || 200,
-      components: salaryComponents
+      components: salaryComponents,
+      standardWorkHoursPerDay: parseFloat(standardWorkHoursPerDay) || 8,
+      standardWorkDaysPerMonth: parseInt(standardWorkDaysPerMonth) || 30,
+      overtimeEnabled: wageType === 'FIXED' ? overtimeEnabled : false,
+      overtimeRate: wageType === 'FIXED' && overtimeEnabled ? parseFloat(overtimeRate) || 0 : 0,
     }
 
     setLoading(true)
@@ -183,11 +201,80 @@ const SalaryStructureModal = ({ isOpen, onClose, employee, onSuccess }) => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Wage Type Selection */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Salary Model <span className="text-red-500">*</span>
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setWageType('FIXED')}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  wageType === 'FIXED'
+                    ? 'border-blue-600 bg-blue-50 shadow-md'
+                    : 'border-gray-300 bg-white hover:border-gray-400'
+                }`}
+              >
+                <div className="text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className={`w-4 h-4 rounded-full border-2 ${
+                      wageType === 'FIXED' ? 'border-blue-600 bg-blue-600' : 'border-gray-300'
+                    } flex items-center justify-center`}>
+                      {wageType === 'FIXED' && (
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      )}
+                    </div>
+                    <h4 className={`font-semibold ${wageType === 'FIXED' ? 'text-blue-900' : 'text-gray-700'}`}>
+                      Monthly Fixed Wage
+                    </h4>
+                  </div>
+                  <p className="text-xs text-gray-600 ml-6">
+                    Pay a fixed monthly salary with optional overtime tracking
+                  </p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setWageType('HOURLY')}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  wageType === 'HOURLY'
+                    ? 'border-blue-600 bg-blue-50 shadow-md'
+                    : 'border-gray-300 bg-white hover:border-gray-400'
+                }`}
+              >
+                <div className="text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className={`w-4 h-4 rounded-full border-2 ${
+                      wageType === 'HOURLY' ? 'border-blue-600 bg-blue-600' : 'border-gray-300'
+                    } flex items-center justify-center`}>
+                      {wageType === 'HOURLY' && (
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      )}
+                    </div>
+                    <h4 className={`font-semibold ${wageType === 'HOURLY' ? 'text-blue-900' : 'text-gray-700'}`}>
+                      Hourly Wage
+                    </h4>
+                  </div>
+                  <p className="text-xs text-gray-600 ml-6">
+                    Pay based on actual hours worked by employee
+                  </p>
+                </div>
+              </button>
+            </div>
+          </div>
+
           {/* Wage */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Monthly Wage (Fixed) <span className="text-red-500">*</span>
+              {wageType === 'FIXED' ? 'Monthly Wage (Fixed)' : 'Hourly Rate'} <span className="text-red-500">*</span>
             </label>
+            <p className="text-xs text-gray-600 mb-2">
+              {wageType === 'FIXED' 
+                ? 'Enter the fixed monthly salary amount'
+                : 'Enter the hourly rate. Total salary will be calculated based on hours worked.'}
+            </p>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
               <input
@@ -195,13 +282,124 @@ const SalaryStructureModal = ({ isOpen, onClose, employee, onSuccess }) => {
                 value={wage}
                 onChange={(e) => setWage(e.target.value)}
                 className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg font-semibold"
-                placeholder="50000"
+                placeholder={wageType === 'FIXED' ? '50000' : '500'}
                 required
                 min="0"
                 step="0.01"
               />
+              {wageType === 'HOURLY' && (
+                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                  per hour
+                </span>
+              )}
             </div>
           </div>
+
+          {/* Overtime Settings (Only for FIXED wage type) */}
+          {wageType === 'FIXED' && (
+            <div className="bg-gradient-to-r from-green-50 to-teal-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">Overtime Pay Settings</h3>
+                  <p className="text-sm text-gray-600">Enable overtime calculation based on actual hours worked</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={overtimeEnabled}
+                    onChange={(e) => setOvertimeEnabled(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              {overtimeEnabled && (
+                <div className="space-y-4 pt-4 border-t border-green-300">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>How it works:</strong> The system calculates total hours based on your standard work hours. 
+                      Any hours worked beyond the standard will be considered overtime and paid at the overtime rate.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Standard Work Hours Per Day
+                      </label>
+                      <input
+                        type="number"
+                        value={standardWorkHoursPerDay}
+                        onChange={(e) => setStandardWorkHoursPerDay(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="8"
+                        required={overtimeEnabled}
+                        min="1"
+                        max="24"
+                        step="0.5"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">e.g., 8 hours per day</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Standard Work Days Per Month
+                      </label>
+                      <input
+                        type="number"
+                        value={standardWorkDaysPerMonth}
+                        onChange={(e) => setStandardWorkDaysPerMonth(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="30"
+                        required={overtimeEnabled}
+                        min="1"
+                        max="31"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">e.g., 30 days per month</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-gray-300 rounded-lg p-3">
+                    <p className="text-sm font-medium text-gray-700 mb-1">
+                      Standard Monthly Hours:
+                    </p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {parseFloat(standardWorkHoursPerDay || 8) * parseInt(standardWorkDaysPerMonth || 30)} hours
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      ({standardWorkHoursPerDay || 8} hrs/day × {standardWorkDaysPerMonth || 30} days)
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Overtime Rate (₹ per hour) <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+                      <input
+                        type="number"
+                        value={overtimeRate}
+                        onChange={(e) => setOvertimeRate(e.target.value)}
+                        className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="100"
+                        required={overtimeEnabled}
+                        min="0"
+                        step="0.01"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                        per hour
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Amount paid for each overtime hour worked beyond standard hours
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Salary Components */}
           <div>
@@ -319,24 +517,39 @@ const SalaryStructureModal = ({ isOpen, onClose, employee, onSuccess }) => {
             <h4 className="font-semibold text-gray-800 mb-3">Salary Summary</h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Monthly Wage:</span>
-                <span className="font-semibold">₹{wageNum.toFixed(2)}</span>
+                <span className="text-gray-600">
+                  {wageType === 'FIXED' ? 'Monthly Wage:' : 'Hourly Rate:'}
+                </span>
+                <span className="font-semibold">
+                  ₹{wageNum.toFixed(2)}{wageType === 'HOURLY' && '/hr'}
+                </span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Total Components:</span>
-                <span className="font-semibold">₹{finalTotal.toFixed(2)}</span>
-              </div>
-              <div className="border-t pt-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Difference:</span>
-                  <span className={`font-bold ${finalTotal > wageNum ? 'text-red-600' : 'text-green-600'}`}>
-                    ₹{Math.abs(wageNum - finalTotal).toFixed(2)}
-                  </span>
+              {wageType === 'FIXED' && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Total Components:</span>
+                    <span className="font-semibold">₹{finalTotal.toFixed(2)}</span>
+                  </div>
+                  <div className="border-t pt-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Difference:</span>
+                      <span className={`font-bold ${finalTotal > wageNum ? 'text-red-600' : 'text-green-600'}`}>
+                        ₹{Math.abs(wageNum - finalTotal).toFixed(2)}
+                      </span>
+                    </div>
+                    {finalTotal > wageNum && (
+                      <p className="text-xs text-red-600 mt-1">⚠️ Total exceeds wage! Adjust components.</p>
+                    )}
+                  </div>
+                </>
+              )}
+              {wageType === 'HOURLY' && (
+                <div className="bg-blue-100 border border-blue-200 rounded p-3 mt-2">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> For hourly wages, salary components will be calculated based on actual hours worked by the employee during payroll generation.
+                  </p>
                 </div>
-                {finalTotal > wageNum && (
-                  <p className="text-xs text-red-600 mt-1">⚠️ Total exceeds wage! Adjust components.</p>
-                )}
-              </div>
+              )}
             </div>
           </div>
 
@@ -387,7 +600,7 @@ const SalaryStructureModal = ({ isOpen, onClose, employee, onSuccess }) => {
             </button>
             <button
               type="submit"
-              disabled={loading || finalTotal > wageNum}
+              disabled={loading || (wageType === 'FIXED' && finalTotal > wageNum)}
               className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {loading ? 'Saving...' : 'Save Salary Structure'}
