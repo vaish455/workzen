@@ -4,13 +4,10 @@ import {
   calculateGrossSalary,
   calculateNetSalary,
   calculateProratedAmount,
-  calculateTotalWorkedHours,
-  calculateHourlyComponentAmount,
-  calculateOvertime,
-  calculateHourlyRateFromMonthly,
   roundToTwo,
 } from '../utils/salaryCalculations.js';
 import { getWorkingDaysInMonth, getMonthDateRange, getMonthName } from '../utils/dateHelpers.js';
+import { sendMonthlySalarySlip } from '../utils/emailTemplates.js';
 
 /**
  * Generate Payrun for All Employees
@@ -152,132 +149,34 @@ const generateEmployeePayslip = async (employee, periodStart, periodEnd, working
   // Get salary structure
   const salaryStructure = employee.salaryStructure;
   const wage = parseFloat(salaryStructure.wage);
-  const wageType = salaryStructure.wageType; // 'FIXED' or 'HOURLY'
   const pfRate = parseFloat(salaryStructure.pfRate);
   const professionalTax = parseFloat(salaryStructure.professionalTax);
   
-  // Calculate total worked hours
-  const totalWorkedHours = calculateTotalWorkedHours(attendances);
-  
-  // Initialize overtime variables
-  let standardHours = 0;
-  let overtimeHours = 0;
-  let overtimePay = 0;
-  
-  // Calculate component amounts based on wage type
+  // Calculate component amounts (prorated based on worked days)
   const payslipComponents = [];
   let basicWage = 0;
   
-  if (wageType === 'HOURLY') {
-    // For hourly wage, calculate based on worked hours
+  for (const component of salaryStructure.components) {
+    const fullAmount = parseFloat(component.amount);
+    const proratedAmount = calculateProratedAmount(fullAmount, workingDays, workedDays);
     
-    // Calculate components based on hourly rate
-    for (const component of salaryStructure.components) {
-      let componentAmount = 0;
-      const componentValue = parseFloat(component.value);
-      
-      if (component.computationType === 'PERCENTAGE_OF_WAGE') {
-        // Calculate as percentage of total hourly earnings
-        const totalHourlyEarnings = wage * totalWorkedHours;
-        componentAmount = (totalHourlyEarnings * componentValue) / 100;
-      } else if (component.computationType === 'PERCENTAGE_OF_BASIC') {
-        // Calculate based on basic amount (need to calculate basic first)
-        if (component.name === 'Basic') {
-          // Basic is percentage of total hourly earnings
-          const totalHourlyEarnings = wage * totalWorkedHours;
-          componentAmount = (totalHourlyEarnings * componentValue) / 100;
-          basicWage = roundToTwo(componentAmount);
-        } else {
-          // Calculate based on already computed basic wage
-          componentAmount = (basicWage * componentValue) / 100;
-        }
-      } else if (component.computationType === 'FIXED_AMOUNT') {
-        // Fixed amount per month (not prorated for hourly)
-        componentAmount = parseFloat(component.amount);
-      }
-      
-      payslipComponents.push({
-        name: component.name,
-        ratePercent: 100,
-        amount: roundToTwo(componentAmount),
-        isDeduction: false,
-        order: component.order,
-      });
-      
-      if (component.name === 'Basic' && basicWage === 0) {
-        basicWage = roundToTwo(componentAmount);
-      }
-    }
-  } else {
-    // For fixed monthly wage, calculate based on hours if overtime is enabled
-    const overtimeEnabled = salaryStructure.overtimeEnabled || false;
+    payslipComponents.push({
+      name: component.name,
+      ratePercent: 100, // Full rate
+      amount: roundToTwo(proratedAmount),
+      isDeduction: false,
+      order: component.order,
+    });
     
-    if (overtimeEnabled) {
-      // Calculate with overtime
-      const standardHoursPerDay = parseFloat(salaryStructure.standardWorkHoursPerDay) || 8;
-      const standardDaysPerMonth = parseInt(salaryStructure.standardWorkDaysPerMonth) || 30;
-      const overtimeRate = parseFloat(salaryStructure.overtimeRate) || 0;
-      
-      const overtimeCalc = calculateOvertime(totalWorkedHours, standardHoursPerDay, standardDaysPerMonth, overtimeRate);
-      standardHours = overtimeCalc.standardHours;
-      overtimeHours = overtimeCalc.overtimeHours;
-      overtimePay = overtimeCalc.overtimePay;
-      
-      // For fixed wage with overtime, components remain full amount (not prorated)
-      for (const component of salaryStructure.components) {
-        const fullAmount = parseFloat(component.amount);
-        
-        payslipComponents.push({
-          name: component.name,
-          ratePercent: 100,
-          amount: roundToTwo(fullAmount),
-          isDeduction: false,
-          order: component.order,
-        });
-        
-        if (component.name === 'Basic') {
-          basicWage = roundToTwo(fullAmount);
-        }
-      }
-    } else {
-      // Standard fixed wage - prorate based on worked days
-      for (const component of salaryStructure.components) {
-        const fullAmount = parseFloat(component.amount);
-        const proratedAmount = calculateProratedAmount(fullAmount, workingDays, workedDays);
-        
-        payslipComponents.push({
-          name: component.name,
-          ratePercent: 100,
-          amount: roundToTwo(proratedAmount),
-          isDeduction: false,
-          order: component.order,
-        });
-        
-        if (component.name === 'Basic') {
-          basicWage = roundToTwo(proratedAmount);
-        }
-      }
+    if (component.name === 'Basic') {
+      basicWage = roundToTwo(proratedAmount);
     }
   }
   
   // Calculate gross salary
-  let grossWage = payslipComponents.reduce((sum, comp) => {
+  const grossWage = payslipComponents.reduce((sum, comp) => {
     return sum + parseFloat(comp.amount);
   }, 0);
-  
-  // Add overtime pay to gross if applicable
-  if (overtimePay > 0) {
-    grossWage += overtimePay;
-    
-    // Add overtime as a separate component
-    payslipComponents.push({
-      name: 'Overtime Pay',
-      ratePercent: 100,
-      amount: roundToTwo(overtimePay),
-      isDeduction: false,
-      order: 50,
-    });
-  }
   
   // Calculate deductions
   const pfDeduction = calculatePF(basicWage, pfRate);
@@ -304,7 +203,7 @@ const generateEmployeePayslip = async (employee, periodStart, periodEnd, working
   const totalDeductions = roundToTwo(pfDeduction + professionalTaxDeduction);
   const netWage = calculateNetSalary(grossWage, totalDeductions);
   
-  // Employee cost includes overtime
+  // Employee cost (same as gross for monthly wage)
   const employeeCost = grossWage;
   
   // Create payslip
@@ -318,10 +217,6 @@ const generateEmployeePayslip = async (employee, periodStart, periodEnd, working
       workedDays,
       paidLeaveDays,
       unpaidLeaveDays,
-      totalHours: roundToTwo(totalWorkedHours),
-      standardHours: standardHours > 0 ? roundToTwo(standardHours) : null,
-      overtimeHours: overtimeHours > 0 ? roundToTwo(overtimeHours) : 0,
-      overtimePay: overtimePay > 0 ? roundToTwo(overtimePay) : 0,
       basicWage: roundToTwo(basicWage),
       grossWage: roundToTwo(grossWage),
       totalDeductions: roundToTwo(totalDeductions),
@@ -547,6 +442,19 @@ export const validatePayslip = async (req, res, next) => {
           companyId: currentUser.companyId,
         },
       },
+      include: {
+        employee: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        components: {
+          orderBy: { order: 'asc' },
+        },
+      },
     });
     
     if (!payslip) {
@@ -570,6 +478,58 @@ export const validatePayslip = async (req, res, next) => {
         validatedAt: new Date(),
       },
     });
+    
+    // Send salary slip email
+    try {
+      const userName = `${payslip.employee.firstName} ${payslip.employee.lastName}`;
+      
+      // Extract month and year from payPeriod
+      const periodDate = new Date(payslip.periodStart);
+      const month = getMonthName(periodDate.getMonth());
+      const year = periodDate.getFullYear();
+      
+      // Calculate earnings and deductions
+      const earnings = payslip.components.filter(c => !c.isDeduction);
+      const deductions = payslip.components.filter(c => c.isDeduction);
+      
+      const basicSalary = earnings.find(e => e.name === 'Basic')?.amount || 0;
+      const hra = earnings.find(e => e.name === 'HRA')?.amount || 0;
+      const otherAllowances = earnings
+        .filter(e => e.name !== 'Basic' && e.name !== 'HRA')
+        .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+      
+      const providentFund = deductions.find(d => d.name === 'Provident Fund')?.amount || 0;
+      const tax = deductions.find(d => d.name === 'Professional Tax')?.amount || 0;
+      const otherDeductions = deductions
+        .filter(d => d.name !== 'Provident Fund' && d.name !== 'Professional Tax')
+        .reduce((sum, d) => sum + parseFloat(d.amount), 0);
+      
+      await sendMonthlySalarySlip(
+        payslip.employee.email,
+        userName,
+        month,
+        year,
+        {
+          basicSalary: parseFloat(basicSalary),
+          hra: parseFloat(hra),
+          otherAllowances: parseFloat(otherAllowances),
+          grossSalary: parseFloat(payslip.grossWage),
+          providentFund: parseFloat(providentFund),
+          tax: parseFloat(tax),
+          otherDeductions: parseFloat(otherDeductions),
+          totalDeductions: parseFloat(payslip.totalDeductions),
+          netSalary: parseFloat(payslip.netWage),
+          workingDays: payslip.workingDays,
+          presentDays: payslip.workedDays - payslip.paidLeaveDays,
+          leaveDays: payslip.paidLeaveDays + payslip.unpaidLeaveDays,
+          overtimeHours: 0, // You can add this field to payslip if needed
+          overtimePay: 0, // You can add this field to payslip if needed
+        }
+      );
+    } catch (emailError) {
+      console.error('Failed to send salary slip email:', emailError);
+      // Don't fail validation if email fails
+    }
     
     res.status(200).json({
       success: true,

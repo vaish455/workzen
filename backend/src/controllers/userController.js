@@ -1,6 +1,6 @@
 import prisma from '../config/database.js';
 import { hashPassword, generateRandomPassword, generateLoginId } from '../utils/auth.js';
-import { sendWelcomeEmail } from '../config/email.js';
+import { sendEmployeeWelcomeEmail, sendProfileUpdateNotification, sendAccountLockedEmail } from '../utils/emailTemplates.js';
 import { uploadImage } from '../config/cloudinary.js';
 
 /**
@@ -117,7 +117,14 @@ export const createUser = async (req, res, next) => {
     
     // Send welcome email with credentials
     try {
-      await sendWelcomeEmail(email, `${firstName} ${lastName}`, loginId, randomPassword);
+      await sendEmployeeWelcomeEmail(
+        email,
+        `${firstName} ${lastName}`,
+        loginId,
+        role === 'EMPLOYEE' ? 'General' : role.replace('_', ' '),
+        loginId,
+        randomPassword
+      );
     } catch (emailError) {
       console.error('Failed to send welcome email:', emailError);
       // Don't fail the request if email fails
@@ -331,6 +338,9 @@ export const toggleUserStatus = async (req, res, next) => {
         id,
         companyId: currentUser.companyId,
       },
+      include: {
+        employee: true,
+      },
     });
     
     if (!user) {
@@ -345,6 +355,21 @@ export const toggleUserStatus = async (req, res, next) => {
       where: { id },
       data: { isActive },
     });
+    
+    // Send account locked email if deactivating
+    if (!isActive && user.employee) {
+      try {
+        const userName = `${user.employee.firstName} ${user.employee.lastName}`;
+        await sendAccountLockedEmail(
+          user.email,
+          userName,
+          'Account deactivated by administrator',
+          new Date()
+        );
+      } catch (emailError) {
+        console.error('Failed to send account locked email:', emailError);
+      }
+    }
     
     res.status(200).json({
       success: true,

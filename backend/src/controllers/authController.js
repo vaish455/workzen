@@ -1,6 +1,6 @@
 import prisma from '../config/database.js';
 import { hashPassword, comparePassword, generateToken, generateRandomPassword, generateLoginId } from '../utils/auth.js';
-import { sendWelcomeEmail } from '../config/email.js';
+import { sendAdminWelcomeEmail, sendPasswordChangeEmail } from '../utils/emailTemplates.js';
 
 /**
  * Admin Registration
@@ -75,6 +75,20 @@ export const registerAdmin = async (req, res, next) => {
       
       return { user, company, employee };
     });
+    
+    // Send admin welcome email
+    try {
+      await sendAdminWelcomeEmail(
+        email,
+        name,
+        companyName,
+        loginId,
+        password
+      );
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't fail registration if email fails
+    }
     
     // Generate token
     const token = generateToken({
@@ -248,6 +262,9 @@ export const changePassword = async (req, res, next) => {
     // Get user with password
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
+      include: {
+        employee: true,
+      },
     });
     
     // Verify current password
@@ -268,6 +285,24 @@ export const changePassword = async (req, res, next) => {
       where: { id: req.user.id },
       data: { password: hashedPassword },
     });
+    
+    // Send password change confirmation email
+    try {
+      const userName = user.employee 
+        ? `${user.employee.firstName} ${user.employee.lastName}`
+        : user.email;
+      
+      await sendPasswordChangeEmail(
+        user.email,
+        userName,
+        'you',
+        req.ip || 'Unknown',
+        new Date()
+      );
+    } catch (emailError) {
+      console.error('Failed to send password change email:', emailError);
+      // Don't fail password change if email fails
+    }
     
     res.status(200).json({
       success: true,
