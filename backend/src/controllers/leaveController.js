@@ -1,6 +1,7 @@
 import prisma from '../config/database.js';
 import { calculateDays } from '../utils/dateHelpers.js';
 import { uploadImage } from '../config/cloudinary.js';
+import { sendLeaveStatusNotification } from '../utils/emailTemplates.js';
 
 /**
  * Apply for Leave
@@ -360,6 +361,22 @@ export const approveLeave = async (req, res, next) => {
       return updatedLeave;
     });
     
+    // Send leave approval email
+    try {
+      const userName = `${leave.employee.firstName} ${leave.employee.lastName}`;
+      await sendLeaveStatusNotification(
+        leave.employee.email,
+        userName,
+        leave.leaveType.replace('_', ' '),
+        leave.startDate,
+        leave.endDate,
+        'APPROVED',
+        'Your leave has been approved'
+      );
+    } catch (emailError) {
+      console.error('Failed to send leave approval email:', emailError);
+    }
+    
     res.status(200).json({
       success: true,
       message: 'Leave approved successfully',
@@ -387,6 +404,9 @@ export const rejectLeave = async (req, res, next) => {
           companyId: currentUser.companyId,
         },
       },
+      include: {
+        employee: true,
+      },
     });
     
     if (!leave) {
@@ -413,6 +433,22 @@ export const rejectLeave = async (req, res, next) => {
         rejectionReason: reason,
       },
     });
+    
+    // Send leave rejection email
+    try {
+      const userName = `${leave.employee.firstName} ${leave.employee.lastName}`;
+      await sendLeaveStatusNotification(
+        leave.employee.email,
+        userName,
+        leave.leaveType.replace('_', ' '),
+        leave.startDate,
+        leave.endDate,
+        'REJECTED',
+        reason || 'Your leave has been rejected'
+      );
+    } catch (emailError) {
+      console.error('Failed to send leave rejection email:', emailError);
+    }
     
     res.status(200).json({
       success: true,

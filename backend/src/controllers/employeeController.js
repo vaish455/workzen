@@ -7,6 +7,7 @@ import {
   validateComponentsTotal,
   roundToTwo,
 } from '../utils/salaryCalculations.js';
+import { sendProfileUpdateNotification, sendSalaryUpdateNotification } from '../utils/emailTemplates.js';
 
 /**
  * Get All Employees (Employee Directory)
@@ -225,6 +226,10 @@ export const updateEmployee = async (req, res, next) => {
       });
     }
     
+    // Track which fields are being updated for email notification
+    const updatedFields = [];
+    const originalData = { ...employee };
+    
     // Employees can only update their own profile
     if (currentUser.role === 'EMPLOYEE' && currentUser.employee?.id !== id) {
       return res.status(403).json({
@@ -239,6 +244,29 @@ export const updateEmployee = async (req, res, next) => {
     delete updateData.yearOfJoining;
     delete updateData.serialNumber;
     delete updateData.user;
+    
+    // Track updated fields for notification
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] !== employee[key] && updateData[key] !== '' && updateData[key] !== null) {
+        const fieldNames = {
+          firstName: 'First Name',
+          lastName: 'Last Name',
+          email: 'Email',
+          phone: 'Phone Number',
+          dateOfBirth: 'Date of Birth',
+          gender: 'Gender',
+          address: 'Address',
+          city: 'City',
+          state: 'State',
+          zipCode: 'ZIP Code',
+          country: 'Country',
+          department: 'Department',
+          designation: 'Designation',
+          employmentType: 'Employment Type',
+        };
+        updatedFields.push(fieldNames[key] || key);
+      }
+    });
     
     // Clean up empty dates and convert to proper format
     if (updateData.dateOfBirth === '' || updateData.dateOfBirth === null) {
@@ -302,6 +330,26 @@ export const updateEmployee = async (req, res, next) => {
         },
       },
     });
+    
+    // Send profile update notification if there were changes
+    if (updatedFields.length > 0) {
+      try {
+        const userName = `${updatedEmployee.firstName} ${updatedEmployee.lastName}`;
+        const updatedBy = currentUser.employee 
+          ? `${currentUser.employee.firstName} ${currentUser.employee.lastName}`
+          : currentUser.email;
+        
+        await sendProfileUpdateNotification(
+          updatedEmployee.email,
+          userName,
+          updatedFields,
+          updatedBy,
+          new Date()
+        );
+      } catch (emailError) {
+        console.error('Failed to send profile update notification:', emailError);
+      }
+    }
     
     res.status(200).json({
       success: true,
@@ -384,17 +432,7 @@ export const uploadProfilePicture = async (req, res, next) => {
 export const updateSalaryStructure = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { 
-      wageType, 
-      wage, 
-      pfRate, 
-      professionalTax, 
-      components,
-      standardWorkHoursPerDay,
-      standardWorkDaysPerMonth,
-      overtimeEnabled,
-      overtimeRate
-    } = req.body;
+    const { wage, pfRate, professionalTax, components } = req.body;
     const currentUser = req.user;
     
     // Check permissions - only Admin and Payroll Officer
@@ -438,24 +476,14 @@ export const updateSalaryStructure = async (req, res, next) => {
         where: { employeeId: id },
         create: {
           employeeId: id,
-          wageType: wageType || 'FIXED',
           wage: wage,
           pfRate: pfRate || 12,
           professionalTax: professionalTax || 200,
-          standardWorkHoursPerDay: standardWorkHoursPerDay || 8,
-          standardWorkDaysPerMonth: standardWorkDaysPerMonth || 30,
-          overtimeEnabled: overtimeEnabled || false,
-          overtimeRate: overtimeRate || 0,
         },
         update: {
-          wageType: wageType || 'FIXED',
           wage: wage,
           pfRate: pfRate || 12,
           professionalTax: professionalTax || 200,
-          standardWorkHoursPerDay: standardWorkHoursPerDay || 8,
-          standardWorkDaysPerMonth: standardWorkDaysPerMonth || 30,
-          overtimeEnabled: overtimeEnabled || false,
-          overtimeRate: overtimeRate || 0,
         },
       });
       
@@ -482,6 +510,24 @@ export const updateSalaryStructure = async (req, res, next) => {
       
       return { salaryStructure, components: newComponents };
     });
+    
+    // Send salary update notification
+    try {
+      const userName = `${employee.firstName} ${employee.lastName}`;
+      const updatedBy = currentUser.employee 
+        ? `${currentUser.employee.firstName} ${currentUser.employee.lastName}`
+        : currentUser.email;
+      
+      await sendSalaryUpdateNotification(
+        employee.email,
+        userName,
+        new Date(), // Effective date
+        updatedBy,
+        new Date()
+      );
+    } catch (emailError) {
+      console.error('Failed to send salary update notification:', emailError);
+    }
     
     res.status(200).json({
       success: true,
