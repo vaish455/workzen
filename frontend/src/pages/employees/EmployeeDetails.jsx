@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Mail, Phone, Calendar, DollarSign } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, Calendar, DollarSign, Edit } from 'lucide-react'
+import SalaryStructureModal from '../../components/employees/SalaryStructureModal'
 
 const EmployeeDetails = () => {
   const navigate = useNavigate()
@@ -11,6 +12,7 @@ const EmployeeDetails = () => {
   const { user } = useAuthStore()
   const [loading, setLoading] = useState(true)
   const [employee, setEmployee] = useState(null)
+  const [showSalaryModal, setShowSalaryModal] = useState(false)
 
   useEffect(() => {
     fetchEmployeeDetails()
@@ -41,6 +43,11 @@ const EmployeeDetails = () => {
   }
 
   const canViewSalary = ['ADMIN', 'PAYROLL_OFFICER'].includes(user?.role) || user?.employee?.id === id
+  const canEditSalary = ['ADMIN', 'PAYROLL_OFFICER'].includes(user?.role)
+
+  const handleSalaryUpdate = () => {
+    fetchEmployeeDetails()
+  }
 
   return (
     <div className="space-y-6">
@@ -176,43 +183,70 @@ const EmployeeDetails = () => {
       </div>
 
       {/* Salary Information - Only visible to Admin/Payroll/Self */}
-      {canViewSalary && employee.salaryStructure && (
+      {canViewSalary && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <DollarSign className="w-5 h-5" />
-            Salary Information
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-gray-600">Monthly Wage</p>
-              <p className="text-2xl font-bold text-gray-800">
-                ₹{parseFloat(employee.salaryStructure.wage).toLocaleString()}
-              </p>
-            </div>
-
-            <div className="border-t pt-4">
-              <h4 className="font-medium text-gray-800 mb-3">Salary Components</h4>
-              <div className="space-y-2">
-                {employee.salaryStructure.components?.map((component) => (
-                  <div key={component.id} className="flex justify-between items-center py-2 border-b last:border-0">
-                    <span className="text-gray-700">{component.name}</span>
-                    <span className="font-medium">₹{parseFloat(component.amount).toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">PF Rate</span>
-                <span className="font-medium">{employee.salaryStructure.pfRate}%</span>
-              </div>
-              <div className="flex justify-between items-center mt-2">
-                <span className="text-gray-600">Professional Tax</span>
-                <span className="font-medium">₹{employee.salaryStructure.professionalTax}</span>
-              </div>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <DollarSign className="w-5 h-5" />
+              Salary Information
+            </h3>
+            {canEditSalary && (
+              <button
+                onClick={() => setShowSalaryModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+                {employee.salaryStructure ? 'Edit Salary' : 'Add Salary'}
+              </button>
+            )}
           </div>
+
+          {employee.salaryStructure ? (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600">Monthly Wage</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  ₹{parseFloat(employee.salaryStructure.wage).toLocaleString()}
+                </p>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-medium text-gray-800 mb-3">Salary Components</h4>
+                <div className="space-y-2">
+                  {employee.salaryStructure.components?.map((component) => (
+                    <div key={component.id} className="flex justify-between items-center py-2 border-b last:border-0">
+                      <span className="text-gray-700">{component.name}</span>
+                      <span className="font-medium">₹{parseFloat(component.amount).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">PF Rate</span>
+                  <span className="font-medium">{employee.salaryStructure.pfRate}%</span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-gray-600">Professional Tax</span>
+                  <span className="font-medium">₹{employee.salaryStructure.professionalTax}</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-500 mb-4">No salary structure defined yet</p>
+              {canEditSalary && (
+                <button
+                  onClick={() => setShowSalaryModal(true)}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Add Salary Structure
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -235,6 +269,14 @@ const EmployeeDetails = () => {
           </div>
         </div>
       )}
+      
+      {/* Salary Structure Modal */}
+      <SalaryStructureModal
+        isOpen={showSalaryModal}
+        onClose={() => setShowSalaryModal(false)}
+        employee={employee}
+        onSuccess={handleSalaryUpdate}
+      />
     </div>
   )
 }
