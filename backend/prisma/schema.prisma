@@ -1,0 +1,290 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+  HR_OFFICER
+  PAYROLL_OFFICER
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  ON_LEAVE
+  HALF_DAY
+}
+
+enum LeaveType {
+  PAID_TIME_OFF
+  SICK_LEAVE
+  UNPAID_LEAVE
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum PayslipStatus {
+  DRAFT
+  DONE
+  CANCELLED
+}
+
+enum WageType {
+  FIXED
+}
+
+enum ComputationType {
+  FIXED_AMOUNT
+  PERCENTAGE_OF_WAGE
+  PERCENTAGE_OF_BASIC
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+}
+
+// Models
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  phone       String
+  logo        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  users       User[]
+  employees   Employee[]
+  
+  @@map("companies")
+}
+
+model User {
+  id                String    @id @default(uuid())
+  loginId           String    @unique
+  email             String    @unique
+  password          String
+  role              UserRole
+  companyId         String
+  isActive          Boolean   @default(true)
+  lastLogin         DateTime?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employee          Employee?
+  
+  @@map("users")
+}
+
+model Employee {
+  id                    String         @id @default(uuid())
+  userId                String         @unique
+  companyId             String
+  firstName             String
+  lastName              String
+  email                 String
+  phone                 String?
+  profilePicture        String?
+  
+  // Personal Information
+  dateOfBirth           DateTime?
+  residingAddress       String?
+  nationality           String?
+  personalEmail         String?
+  gender                Gender?
+  maritalStatus         MaritalStatus?
+  
+  // Employment Information
+  dateOfJoining         DateTime
+  employeeCode          String?
+  yearOfJoining         Int
+  serialNumber          Int
+  
+  // Bank Details
+  accountNumber         String?
+  bankName              String?
+  ifscCode              String?
+  panNumber             String?
+  uanNumber             String?
+  
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  
+  user                  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company               Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  salaryStructure       SalaryStructure?
+  attendances           Attendance[]
+  leaves                Leave[]
+  leaveBalances         LeaveBalance[]
+  payslips              Payslip[]
+  
+  @@unique([companyId, serialNumber, yearOfJoining])
+  @@map("employees")
+}
+
+model SalaryStructure {
+  id                String              @id @default(uuid())
+  employeeId        String              @unique
+  wageType          WageType            @default(FIXED)
+  wage              Decimal             @db.Decimal(10, 2)
+  pfRate            Decimal             @default(12) @db.Decimal(5, 2)
+  professionalTax   Decimal             @default(200) @db.Decimal(10, 2)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  employee          Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  components        SalaryComponent[]
+  
+  @@map("salary_structures")
+}
+
+model SalaryComponent {
+  id                  String            @id @default(uuid())
+  salaryStructureId   String
+  name                String
+  computationType     ComputationType
+  value               Decimal           @db.Decimal(10, 2)
+  amount              Decimal           @db.Decimal(10, 2)
+  order               Int               @default(0)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  
+  salaryStructure     SalaryStructure   @relation(fields: [salaryStructureId], references: [id], onDelete: Cascade)
+  
+  @@map("salary_components")
+}
+
+model Attendance {
+  id            String            @id @default(uuid())
+  employeeId    String
+  date          DateTime          @db.Date
+  checkIn       DateTime?
+  checkOut      DateTime?
+  status        AttendanceStatus  @default(ABSENT)
+  workingHours  Decimal?          @db.Decimal(5, 2)
+  remarks       String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  
+  employee      Employee          @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  @@unique([employeeId, date])
+  @@map("attendances")
+}
+
+model LeaveBalance {
+  id                String      @id @default(uuid())
+  employeeId        String
+  leaveType         LeaveType
+  totalDays         Decimal     @default(0) @db.Decimal(5, 2)
+  usedDays          Decimal     @default(0) @db.Decimal(5, 2)
+  remainingDays     Decimal     @default(0) @db.Decimal(5, 2)
+  year              Int
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  employee          Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  @@unique([employeeId, leaveType, year])
+  @@map("leave_balances")
+}
+
+model Leave {
+  id                String        @id @default(uuid())
+  employeeId        String
+  leaveType         LeaveType
+  subject           String
+  description       String?
+  startDate         DateTime      @db.Date
+  endDate           DateTime      @db.Date
+  startTime         DateTime?
+  endTime           DateTime?
+  totalDays         Decimal       @db.Decimal(5, 2)
+  status            LeaveStatus   @default(PENDING)
+  note              String?
+  certificate       String?       // URL for sick leave certificate
+  approvedBy        String?
+  approvedAt        DateTime?
+  rejectionReason   String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  employee          Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  @@map("leaves")
+}
+
+model Payslip {
+  id                String          @id @default(uuid())
+  employeeId        String
+  payPeriod         String          // e.g., "Oct 2025"
+  periodStart       DateTime        @db.Date
+  periodEnd         DateTime        @db.Date
+  workingDays       Int
+  workedDays        Decimal         @db.Decimal(5, 2)
+  paidLeaveDays     Decimal         @default(0) @db.Decimal(5, 2)
+  unpaidLeaveDays   Decimal         @default(0) @db.Decimal(5, 2)
+  
+  // Salary breakdown
+  basicWage         Decimal         @db.Decimal(10, 2)
+  grossWage         Decimal         @db.Decimal(10, 2)
+  totalDeductions   Decimal         @db.Decimal(10, 2)
+  netWage           Decimal         @db.Decimal(10, 2)
+  employeeCost      Decimal         @db.Decimal(10, 2)
+  
+  status            PayslipStatus   @default(DRAFT)
+  generatedAt       DateTime        @default(now())
+  validatedAt       DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  employee          Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  components        PayslipComponent[]
+  
+  @@unique([employeeId, periodStart, periodEnd])
+  @@map("payslips")
+}
+
+model PayslipComponent {
+  id            String    @id @default(uuid())
+  payslipId     String
+  name          String
+  ratePercent   Decimal   @db.Decimal(5, 2)
+  amount        Decimal   @db.Decimal(10, 2)
+  isDeduction   Boolean   @default(false)
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  
+  payslip       Payslip   @relation(fields: [payslipId], references: [id], onDelete: Cascade)
+  
+  @@map("payslip_components")
+}
