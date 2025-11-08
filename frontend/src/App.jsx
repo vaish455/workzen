@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -47,40 +47,73 @@ import Settings from './pages/settings/Settings'
 const ProtectedRoute = ({ children, roles }) => {
   const { user, isAuthenticated } = useAuthStore()
   
+  // Prevent rendering if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
   
-  if (roles && !roles.includes(user?.role)) {
-    return <Navigate to="/unauthorized" replace />
+  // Prevent rendering if user role doesn't match
+  if (roles && user?.role && !roles.includes(user.role)) {
+    // Redirect to appropriate dashboard based on role
+    if (user.role === 'EMPLOYEE') {
+      return <Navigate to="/dashboard/employee" replace />
+    }
+    return <Navigate to="/dashboard" replace />
   }
   
   return children
 }
 
 function App() {
-  const { initializeAuth } = useAuthStore()
+  const { user, isAuthenticated, initializeAuth } = useAuthStore()
+  const [isInitialized, setIsInitialized] = useState(false)
+  const hasInitialized = useRef(false)
   
   useEffect(() => {
-    initializeAuth()
-  }, [initializeAuth])
+    // Prevent double initialization in React StrictMode
+    if (hasInitialized.current) return
+    hasInitialized.current = true
+    
+    initializeAuth().finally(() => setIsInitialized(true))
+  }, []) // Keep empty - we only want this to run once on mount
+  
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  // Dashboard redirect based on role
+  const DashboardRedirect = () => {
+    if (user?.role === 'EMPLOYEE') {
+      return <Navigate to="/dashboard/employee" replace />
+    }
+    return <Navigate to="/dashboard" replace />
+  }
   
   return (
     <>
       <Toaster position="top-right" />
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register-admin" element={<RegisterAdmin />} />
+        <Route path="/login" element={
+          isAuthenticated ? <Navigate to="/" replace /> : <Login />
+        } />
+        <Route path="/register-admin" element={
+          isAuthenticated ? <Navigate to="/" replace /> : <RegisterAdmin />
+        } />
         
-        {/* Protected Routes */}
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }>
+        {/* Protected Routes - Remove the nested ProtectedRoute wrapper */}
+        <Route 
+          path="/" 
+          element={
+            isAuthenticated ? <Layout /> : <Navigate to="/login" replace />
+          }
+        >
           {/* Dashboard */}
-          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route index element={<DashboardRedirect />} />
           <Route path="dashboard" element={
             <ProtectedRoute roles={['ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER']}>
               <AdminDashboard />

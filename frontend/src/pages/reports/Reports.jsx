@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { FileText, Download, Loader, Printer } from 'lucide-react'
@@ -12,7 +12,7 @@ const Reports = () => {
   })
   const [employees, setEmployees] = useState([])
 
-  useState(() => {
+  useEffect(() => {
     fetchEmployees()
   }, [])
 

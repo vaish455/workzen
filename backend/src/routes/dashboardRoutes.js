@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticate, isHROrAdmin, canManagePayroll } from '../middleware/auth.js';
+import { authenticate, isAdmin, canManagePayroll } from '../middleware/auth.js';
 import {
   getDashboardStats,
   getEmployeeDashboard,
@@ -12,17 +12,17 @@ import {
 
 const router = express.Router();
 
-// Dashboard routes
+// Dashboard statistics
 router.get('/stats', authenticate, getDashboardStats);
 router.get('/employee', authenticate, getEmployeeDashboard);
-router.get('/overview', authenticate, isHROrAdmin, getCompanyOverview);
+router.get('/overview', authenticate, isAdmin, getCompanyOverview);
 
 // Analytics routes
-router.get('/attendance-analytics', authenticate, isHROrAdmin, getAttendanceAnalytics);
-router.get('/leave-analytics', authenticate, isHROrAdmin, getLeaveAnalytics);
+router.get('/attendance-analytics', authenticate, getAttendanceAnalytics);
+router.get('/leave-analytics', authenticate, getLeaveAnalytics);
 router.get('/payroll-analytics', authenticate, canManagePayroll, getPayrollAnalytics);
 
-// Reports routes
+// Reports
 router.get('/salary-statement', authenticate, canManagePayroll, getSalaryStatement);
 
 export default router;
