@@ -245,6 +245,12 @@ export const updateEmployee = async (req, res, next) => {
     delete updateData.serialNumber;
     delete updateData.user;
     
+    // Map 'address' to 'residingAddress' if it exists
+    if (updateData.address !== undefined) {
+      updateData.residingAddress = updateData.address;
+      delete updateData.address;
+    }
+    
     // Track updated fields for notification
     Object.keys(updateData).forEach(key => {
       if (updateData[key] !== employee[key] && updateData[key] !== '' && updateData[key] !== null) {
@@ -255,14 +261,15 @@ export const updateEmployee = async (req, res, next) => {
           phone: 'Phone Number',
           dateOfBirth: 'Date of Birth',
           gender: 'Gender',
-          address: 'Address',
-          city: 'City',
-          state: 'State',
-          zipCode: 'ZIP Code',
-          country: 'Country',
-          department: 'Department',
-          designation: 'Designation',
-          employmentType: 'Employment Type',
+          residingAddress: 'Address',
+          nationality: 'Nationality',
+          personalEmail: 'Personal Email',
+          maritalStatus: 'Marital Status',
+          accountNumber: 'Account Number',
+          bankName: 'Bank Name',
+          ifscCode: 'IFSC Code',
+          panNumber: 'PAN Number',
+          uanNumber: 'UAN Number',
         };
         updatedFields.push(fieldNames[key] || key);
       }
