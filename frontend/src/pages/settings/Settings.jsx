@@ -3,6 +3,7 @@ import { useAuthStore } from '../../store/authStore'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { Settings as SettingsIcon, Users, Building, Save } from 'lucide-react'
+import Button from '../../components/ui/button'
 
 const Settings = () => {
   const { company } = useAuthStore()
@@ -81,33 +82,33 @@ const Settings = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
-        <p className="text-gray-600">Manage your company and user settings</p>
+        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+        <p className="text-gray-600 mt-1">Manage your company and user settings</p>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="border-b border-gray-200">
           <nav className="flex gap-8 px-6">
             {['company', 'users'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-4 border-b-2 font-medium transition-colors capitalize ${
+                className={`py-4 border-b-2 font-medium transition-colors capitalize flex items-center gap-2 ${
                   activeTab === tab
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-800'
+                    ? 'border-[#714B67] text-[#714B67]'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                {tab === 'company' && <Building className="w-4 h-4 inline mr-2" />}
-                {tab === 'users' && <Users className="w-4 h-4 inline mr-2" />}
+                {tab === 'company' && <Building className="w-4 h-4" />}
+                {tab === 'users' && <Users className="w-4 h-4" />}
                 {tab}
               </button>
             ))}
           </nav>
         </div>
 
-        <div className="p-6">
+        <div className="p-8">
           {/* Company Settings Tab */}
           {activeTab === 'company' && (
             <form onSubmit={handleCompanySubmit} className="space-y-6">
@@ -121,7 +122,7 @@ const Settings = () => {
                     name="name"
                     value={companyData.name}
                     onChange={handleCompanyChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                     required
                   />
                 </div>
@@ -135,7 +136,7 @@ const Settings = () => {
                     name="email"
                     value={companyData.email}
                     onChange={handleCompanyChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                     required
                   />
                 </div>
@@ -149,7 +150,7 @@ const Settings = () => {
                     name="phone"
                     value={companyData.phone}
                     onChange={handleCompanyChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -162,7 +163,7 @@ const Settings = () => {
                     name="website"
                     value={companyData.website}
                     onChange={handleCompanyChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                     placeholder="https://example.com"
                   />
                 </div>
@@ -176,19 +177,19 @@ const Settings = () => {
                     value={companyData.address}
                     onChange={handleCompanyChange}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
               </div>
 
-              <button
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={loading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center gap-2"
+                icon={Save}
               >
-                <Save className="w-4 h-4" />
                 {loading ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </form>
           )}
 
@@ -199,36 +200,39 @@ const Settings = () => {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         User
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Email
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Role
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {users.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
+                      <tr 
+                        key={user.id} 
+                        className="transition-colors hover:bg-gray-50"
+                      >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
                             {user.employee?.profilePicture ? (
                               <img
                                 src={user.employee.profilePicture}
                                 alt=""
-                                className="w-10 h-10 rounded-full object-cover"
+                                className="w-10 h-10 rounded-xl object-cover"
                               />
                             ) : (
-                              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                              <div className="w-10 h-10 bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl flex items-center justify-center text-white font-medium shadow-sm">
                                 {user.employee?.firstName?.charAt(0)}{user.employee?.lastName?.charAt(0)}
                               </div>
                             )}
@@ -236,18 +240,18 @@ const Settings = () => {
                               <p className="font-medium text-gray-900">
                                 {user.employee?.firstName} {user.employee?.lastName}
                               </p>
-                              <p className="text-sm text-gray-500">{user.loginId}</p>
+                              <p className="text-sm text-gray-600">{user.loginId}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {user.email}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select
                             value={user.role}
                             onChange={(e) => handleChangeUserRole(user.id, e.target.value)}
-                            className="text-sm border border-gray-300 rounded px-2 py-1"
+                            className="text-sm rounded-xl px-3 py-2 border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all"
                           >
                             <option value="EMPLOYEE">Employee</option>
                             <option value="HR_OFFICER">HR Officer</option>
@@ -256,22 +260,23 @@ const Settings = () => {
                           </select>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            user.isActive 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
+                          <span 
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              user.isActive
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}
+                          >
                             {user.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
                             onClick={() => handleToggleUserStatus(user.id, user.isActive)}
-                            className={`text-sm font-medium ${
-                              user.isActive 
-                                ? 'text-red-600 hover:text-red-700' 
-                                : 'text-green-600 hover:text-green-700'
-                            }`}
+                            className="text-sm font-medium hover:underline"
+                            style={{
+                              color: user.isActive ? '#dc3545' : '#28a745'
+                            }}
                           >
                             {user.isActive ? 'Deactivate' : 'Activate'}
                           </button>
@@ -290,3 +295,5 @@ const Settings = () => {
 }
 
 export default Settings
+
+

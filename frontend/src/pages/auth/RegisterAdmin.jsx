@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import toast from 'react-hot-toast'
 import { Building2, Loader } from 'lucide-react'
+import Button from '../../components/ui/button'
+import { motion } from 'framer-motion'
 
 const RegisterAdmin = () => {
   const navigate = useNavigate()
@@ -57,21 +59,37 @@ const RegisterAdmin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#FFE5EC] via-[#F3E5F5] to-[#E1F5FE]">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+        className="bg-white rounded-xl shadow-lg border border-gray-200 w-full max-w-2xl p-8"
+      >
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-block p-3 bg-blue-600 rounded-full mb-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="text-center mb-8"
+        >
+          <div className="w-16 h-16 bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#714B67]/20">
             <Building2 className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Register Your Company</h1>
-          <p className="text-gray-600 mt-2">Create your WorkZen admin account</p>
-        </div>
+          <h1 className="text-3xl font-bold text-gray-900">Register Your Company</h1>
+          <p className="mt-2 text-gray-600">Create your WorkZen admin account</p>
+        </motion.div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <motion.form
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
           <div>
-            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="companyName" className="block text-sm font-medium mb-2 text-gray-700">
               Company Name
             </label>
             <input
@@ -80,16 +98,16 @@ const RegisterAdmin = () => {
               name="companyName"
               value={formData.companyName}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
               placeholder="Enter company name"
               required
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Your Name
+              <label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-700">
+                Full Name
               </label>
               <input
                 type="text"
@@ -97,48 +115,48 @@ const RegisterAdmin = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter your full name"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
+                placeholder="Enter your name"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
+              <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-700">
+                Email Address
               </label>
               <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter phone number"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
+                placeholder="admin@company.com"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
+            <label htmlFor="phone" className="block text-sm font-medium mb-2 text-gray-700">
+              Phone Number
             </label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter email address"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
+              placeholder="+1 (555) 123-4567"
               required
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium mb-2 text-gray-700">
                 Password
               </label>
               <input
@@ -147,7 +165,7 @@ const RegisterAdmin = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                 placeholder="Create password"
                 required
                 minLength={6}
@@ -155,7 +173,7 @@ const RegisterAdmin = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2 text-gray-700">
                 Confirm Password
               </label>
               <input
@@ -164,7 +182,7 @@ const RegisterAdmin = () => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                 placeholder="Confirm password"
                 required
                 minLength={6}
@@ -175,7 +193,7 @@ const RegisterAdmin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#714B67] text-white font-medium rounded-lg hover:bg-[#5A3C52] focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
           >
             {loading ? (
               <>
@@ -183,21 +201,32 @@ const RegisterAdmin = () => {
                 Creating account...
               </>
             ) : (
-              'Create Admin Account'
+              <>
+                <Building2 className="w-5 h-5" />
+                Create Admin Account
+              </>
             )}
           </button>
-        </form>
+        </motion.form>
 
         {/* Footer */}
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-6 text-center text-sm text-gray-600"
+        >
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link to="/login" className="font-medium text-[#714B67] hover:text-[#5A3C52] hover:underline">
             Sign in
           </Link>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }
 
 export default RegisterAdmin
+
+
+

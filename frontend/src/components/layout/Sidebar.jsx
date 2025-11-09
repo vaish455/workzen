@@ -10,7 +10,7 @@ import {
   Settings,
 } from 'lucide-react'
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed }) => {
   const { user } = useAuthStore()
 
   const getNavigationItems = () => {
@@ -70,22 +70,29 @@ const Sidebar = () => {
   }
 
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 overflow-y-auto">
-      <nav className="p-4 space-y-1">
+    <aside 
+      className={`fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto transition-all duration-300 ${
+        isCollapsed ? 'w-16' : 'w-64'
+      } bg-white border-r border-gray-200`}
+    >
+      <nav className={`p-4 space-y-1 ${isCollapsed ? 'px-2' : ''}`}>
         {getNavigationItems().map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                 isActive
-                  ? 'bg-blue-50 text-blue-600 font-medium'
+                  ? 'bg-[#FFE5EC] text-[#714B67] font-semibold shadow-sm'
                   : 'text-gray-700 hover:bg-gray-100'
-              }`
+              } ${isCollapsed ? 'justify-center px-2' : ''}`
             }
+            title={isCollapsed ? item.name : ''}
           >
-            <item.icon className="w-5 h-5" />
-            <span>{item.name}</span>
+            <div className="flex items-center gap-3 w-full">
+              <item.icon className={`w-5 h-5 shrink-0 ${window.location.pathname === item.path ? 'stroke-[2.5]' : ''}`} />
+              {!isCollapsed && <span>{item.name}</span>}
+            </div>
           </NavLink>
         ))}
       </nav>
@@ -94,3 +101,5 @@ const Sidebar = () => {
 }
 
 export default Sidebar
+
+

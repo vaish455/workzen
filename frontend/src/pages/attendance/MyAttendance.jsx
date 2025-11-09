@@ -77,7 +77,7 @@ const MyAttendance = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
       </div>
     )
   }
@@ -86,15 +86,15 @@ const MyAttendance = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">My Attendance</h1>
-        <p className="text-gray-600">Track your attendance and working hours</p>
+        <h1 className="text-3xl font-bold text-gray-900">My Attendance</h1>
+        <p className="text-gray-600 mt-1">Track your attendance and working hours</p>
       </div>
 
       {/* Check In/Out Card */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl shadow-lg p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold mb-2">Today's Attendance</h3>
+            <h3 className="text-xl font-bold mb-3">Today's Attendance</h3>
             {todayAttendance?.attendance?.checkIn && (
               <p className="text-sm opacity-90">
                 Checked in at {new Date(todayAttendance.attendance.checkIn).toLocaleTimeString()}
@@ -110,7 +110,7 @@ const MyAttendance = () => {
             {todayAttendance?.canCheckIn && (
               <button
                 onClick={handleCheckIn}
-                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                className="bg-white text-[#714B67] px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition-all duration-200 shadow-lg"
               >
                 Check In
               </button>
@@ -118,7 +118,7 @@ const MyAttendance = () => {
             {todayAttendance?.canCheckOut && (
               <button
                 onClick={handleCheckOut}
-                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                className="bg-white text-[#714B67] px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition-all duration-200 shadow-lg"
               >
                 Check Out
               </button>
@@ -129,50 +129,50 @@ const MyAttendance = () => {
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-green-100 rounded-lg">
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 transition-all duration-200 hover:shadow-lg hover:border-[#714B67]/20">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-green-100 rounded-xl">
               <Clock className="w-5 h-5 text-green-600" />
             </div>
-            <h3 className="font-semibold text-gray-800">Present Days</h3>
+            <h3 className="font-semibold text-gray-900">Present Days</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-800">
+          <p className="text-3xl font-bold text-gray-900">
             {attendanceData?.statistics?.presentDays || 0}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-yellow-100 rounded-lg">
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 transition-all duration-200 hover:shadow-lg hover:border-[#714B67]/20">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-yellow-100 rounded-xl">
               <CalendarIcon className="w-5 h-5 text-yellow-600" />
             </div>
-            <h3 className="font-semibold text-gray-800">Absent Days</h3>
+            <h3 className="font-semibold text-gray-900">Absent Days</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-800">
+          <p className="text-3xl font-bold text-gray-900">
             {attendanceData?.statistics?.absentDays || 0}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 transition-all duration-200 hover:shadow-lg hover:border-[#714B67]/20">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-blue-100 rounded-xl">
               <TrendingUp className="w-5 h-5 text-blue-600" />
             </div>
-            <h3 className="font-semibold text-gray-800">Leave Days</h3>
+            <h3 className="font-semibold text-gray-900">Leave Days</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-800">
+          <p className="text-3xl font-bold text-gray-900">
             {attendanceData?.statistics?.leaveDays || 0}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-100 rounded-lg">
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 transition-all duration-200 hover:shadow-lg hover:border-[#714B67]/20">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-purple-100 rounded-xl">
               <Clock className="w-5 h-5 text-purple-600" />
             </div>
-            <h3 className="font-semibold text-gray-800">Total Hours</h3>
+            <h3 className="font-semibold text-gray-900">Total Hours</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-800">
+          <p className="text-3xl font-bold text-gray-900">
             {attendanceData?.statistics?.totalWorkingHours?.toFixed(1) || 0}h
           </p>
         </div>
@@ -180,17 +180,17 @@ const MyAttendance = () => {
 
       {/* Month Filter */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">Attendance History</h3>
+        <h3 className="text-xl font-bold text-gray-900">Attendance History</h3>
         <input
           type="month"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
         />
       </div>
 
       {/* Attendance Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -260,3 +260,5 @@ const MyAttendance = () => {
 }
 
 export default MyAttendance
+
+

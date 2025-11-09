@@ -179,30 +179,30 @@ const MyProfile = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
-        <p className="text-gray-600">Manage your personal information and settings</p>
+        <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
+        <p className="text-gray-600 mt-1">Manage your personal information and settings</p>
       </div>
 
       {/* Profile Picture */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="flex items-center gap-6">
           <div className="relative">
             {employee?.profilePicture ? (
               <img
                 src={employee.profilePicture}
                 alt="Profile"
-                className="w-24 h-24 rounded-full object-cover"
+                className="w-32 h-32 rounded-xl object-cover shadow-md"
               />
             ) : (
-              <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-semibold">
+              <div className="w-32 h-32 bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-[#714B67]/20">
                 {employee?.firstName?.charAt(0)}{employee?.lastName?.charAt(0)}
               </div>
             )}
             <label
               htmlFor="profile-picture"
-              className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors"
+              className="absolute bottom-0 right-0 bg-[#714B67] p-2.5 rounded-xl cursor-pointer hover:bg-[#5A3C52] transition-all duration-200 shadow-lg"
             >
-              <Camera className="w-4 h-4 text-white" />
+              <Camera className="w-5 h-5 text-white" />
               <input
                 type="file"
                 id="profile-picture"
@@ -213,36 +213,36 @@ const MyProfile = () => {
             </label>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-gray-900">
               {employee?.firstName} {employee?.lastName}
             </h2>
-            <p className="text-gray-600">{user?.role?.replace('_', ' ')}</p>
+            <p className="text-gray-600 mt-1">{user?.role?.replace('_', ' ')}</p>
             <p className="text-sm text-gray-500 mt-1">Login ID: {user?.loginId}</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="border-b border-gray-200">
           <nav className="flex gap-8 px-6">
             {['personal', 'bank', 'salary', 'security'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-4 border-b-2 font-medium transition-colors ${
+                className={`py-4 border-b-2 font-medium transition-colors capitalize ${
                   activeTab === tab
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-800'
+                    ? 'border-[#714B67] text-[#714B67]'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab}
               </button>
             ))}
           </nav>
         </div>
 
-        <div className="p-6">
+        <div className="p-8">
           {/* Personal Information Tab */}
           {activeTab === 'personal' && (
             <form onSubmit={handleProfileSubmit} className="space-y-6">
@@ -256,7 +256,7 @@ const MyProfile = () => {
                     name="firstName"
                     value={profileData.firstName}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -269,7 +269,7 @@ const MyProfile = () => {
                     name="lastName"
                     value={profileData.lastName}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -282,7 +282,7 @@ const MyProfile = () => {
                     name="email"
                     value={profileData.email}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-gray-50 text-gray-900"
                     disabled
                   />
                 </div>
@@ -296,7 +296,7 @@ const MyProfile = () => {
                     name="personalEmail"
                     value={profileData.personalEmail}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -309,7 +309,7 @@ const MyProfile = () => {
                     name="phone"
                     value={profileData.phone}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -322,7 +322,7 @@ const MyProfile = () => {
                     name="dateOfBirth"
                     value={profileData.dateOfBirth}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -334,7 +334,7 @@ const MyProfile = () => {
                     name="gender"
                     value={profileData.gender}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   >
                     <option value="">Select Gender</option>
                     <option value="MALE">Male</option>
@@ -351,7 +351,7 @@ const MyProfile = () => {
                     name="maritalStatus"
                     value={profileData.maritalStatus}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   >
                     <option value="">Select Status</option>
                     <option value="SINGLE">Single</option>
@@ -370,7 +370,7 @@ const MyProfile = () => {
                     name="nationality"
                     value={profileData.nationality}
                     onChange={handleProfileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -383,7 +383,7 @@ const MyProfile = () => {
                     value={profileData.address}
                     onChange={handleProfileChange}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
               </div>
@@ -391,7 +391,7 @@ const MyProfile = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-2 bg-[#714B67] text-white rounded-xl hover:bg-[#5A3C52] transition-colors disabled:bg-[#714B67]/50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
                 {loading ? 'Saving...' : 'Save Changes'}
@@ -412,7 +412,7 @@ const MyProfile = () => {
                     name="employeeCode"
                     value={bankData.employeeCode}
                     onChange={handleBankChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -425,7 +425,7 @@ const MyProfile = () => {
                     name="bankName"
                     value={bankData.bankName}
                     onChange={handleBankChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -438,7 +438,7 @@ const MyProfile = () => {
                     name="accountNumber"
                     value={bankData.accountNumber}
                     onChange={handleBankChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -451,7 +451,7 @@ const MyProfile = () => {
                     name="ifscCode"
                     value={bankData.ifscCode}
                     onChange={handleBankChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -464,7 +464,7 @@ const MyProfile = () => {
                     name="panNumber"
                     value={bankData.panNumber}
                     onChange={handleBankChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
 
@@ -477,7 +477,7 @@ const MyProfile = () => {
                     name="uanNumber"
                     value={bankData.uanNumber}
                     onChange={handleBankChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                   />
                 </div>
               </div>
@@ -485,7 +485,7 @@ const MyProfile = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-2 bg-[#714B67] text-white rounded-xl hover:bg-[#5A3C52] transition-colors disabled:bg-[#714B67]/50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
                 {loading ? 'Saving...' : 'Save Changes'}
@@ -574,7 +574,7 @@ const MyProfile = () => {
                       name="currentPassword"
                       value={passwordData.currentPassword}
                       onChange={handlePasswordChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                       required
                     />
                   </div>
@@ -588,7 +588,7 @@ const MyProfile = () => {
                       name="newPassword"
                       value={passwordData.newPassword}
                       onChange={handlePasswordChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                       required
                       minLength={6}
                     />
@@ -603,7 +603,7 @@ const MyProfile = () => {
                       name="confirmPassword"
                       value={passwordData.confirmPassword}
                       onChange={handlePasswordChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                       required
                       minLength={6}
                     />
@@ -614,7 +614,7 @@ const MyProfile = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-[#714B67] text-white rounded-xl hover:bg-[#5A3C52] transition-colors disabled:bg-[#714B67]/50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Changing...' : 'Change Password'}
               </button>
@@ -627,3 +627,5 @@ const MyProfile = () => {
 }
 
 export default MyProfile
+
+

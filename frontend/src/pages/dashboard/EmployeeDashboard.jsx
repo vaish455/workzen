@@ -60,7 +60,7 @@ const EmployeeDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
       </div>
     )
   }
@@ -69,17 +69,17 @@ const EmployeeDashboard = () => {
     <div className="space-y-6">
       {/* Welcome Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Welcome, {employee?.firstName} {employee?.lastName}!
+        <h1 className="text-3xl font-bold text-gray-900">
+          Welcome, {employee?.firstName} {employee?.lastName}! 👋
         </h1>
-        <p className="text-gray-600">Have a productive day at work</p>
+        <p className="text-gray-600 mt-1">Have a productive day at work</p>
       </div>
 
       {/* Check In/Out Card */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl shadow-lg p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold mb-2">Attendance</h3>
+            <h3 className="text-xl font-bold mb-3">Attendance</h3>
             {todayAttendance?.attendance?.checkIn && (
               <p className="text-sm opacity-90">
                 Checked in at {new Date(todayAttendance.attendance.checkIn).toLocaleTimeString()}
@@ -95,7 +95,7 @@ const EmployeeDashboard = () => {
             {todayAttendance?.canCheckIn && (
               <button
                 onClick={handleCheckIn}
-                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                className="bg-white text-[#714B67] px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition-all duration-200 shadow-lg"
               >
                 Check In
               </button>
@@ -103,7 +103,7 @@ const EmployeeDashboard = () => {
             {todayAttendance?.canCheckOut && (
               <button
                 onClick={handleCheckOut}
-                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                className="bg-white text-[#714B67] px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition-all duration-200 shadow-lg"
               >
                 Check Out
               </button>
@@ -114,31 +114,31 @@ const EmployeeDashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-[#714B67]/20 transition-all duration-200">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-green-100 rounded-lg">
+            <div className="p-3 bg-green-100 rounded-xl">
               <Clock className="w-5 h-5 text-green-600" />
             </div>
-            <h3 className="font-semibold text-gray-800">This Month</h3>
+            <h3 className="font-semibold text-gray-900">This Month</h3>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Present Days</span>
-              <span className="font-medium">{dashboardData?.attendance?.present || 0}</span>
+              <span className="font-medium text-gray-900">{dashboardData?.attendance?.present || 0}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Working Hours</span>
-              <span className="font-medium">{dashboardData?.attendance?.totalHours?.toFixed(1) || 0}h</span>
+              <span className="font-medium text-gray-900">{dashboardData?.attendance?.totalHours?.toFixed(1) || 0}h</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-[#714B67]/20 transition-all duration-200">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-3 bg-blue-100 rounded-xl">
               <Calendar className="w-5 h-5 text-blue-600" />
             </div>
-            <h3 className="font-semibold text-gray-800">Leave Balance</h3>
+            <h3 className="font-semibold text-gray-900">Leave Balance</h3>
           </div>
           <div className="space-y-2">
             {dashboardData?.leaveBalances?.map((balance) => (
@@ -146,28 +146,28 @@ const EmployeeDashboard = () => {
                 <span className="text-gray-600">
                   {balance.leaveType.replace('_', ' ')}
                 </span>
-                <span className="font-medium">{balance.remainingDays} days</span>
+                <span className="font-medium text-gray-900">{balance.remainingDays} days</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-[#714B67]/20 transition-all duration-200">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
+            <div className="p-3 bg-purple-100 rounded-xl">
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
-            <h3 className="font-semibold text-gray-800">Recent Payslip</h3>
+            <h3 className="font-semibold text-gray-900">Recent Payslip</h3>
           </div>
           {dashboardData?.recentPayslips?.[0] ? (
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Period</span>
-                <span className="font-medium">{dashboardData.recentPayslips[0].payPeriod}</span>
+                <span className="font-medium text-gray-900">{dashboardData.recentPayslips[0].payPeriod}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Net Salary</span>
-                <span className="font-medium">
+                <span className="font-medium text-gray-900">
                   ₹{parseFloat(dashboardData.recentPayslips[0].netWage).toLocaleString()}
                 </span>
               </div>
@@ -179,13 +179,13 @@ const EmployeeDashboard = () => {
       </div>
 
       {/* Recent Leaves */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-800">Recent Leave Requests</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Recent Leave Requests</h3>
             <button
               onClick={() => navigate('/timeoff/apply')}
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              className="text-[#714B67] hover:text-[#5A3C52] text-sm font-medium transition-colors"
             >
               Apply for Leave
             </button>
@@ -195,9 +195,9 @@ const EmployeeDashboard = () => {
           {dashboardData?.recentLeaves?.length > 0 ? (
             <div className="space-y-3">
               {dashboardData.recentLeaves.slice(0, 3).map((leave) => (
-                <div key={leave.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={leave.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                   <div>
-                    <p className="font-medium text-gray-800">{leave.subject}</p>
+                    <p className="font-medium text-gray-900">{leave.subject}</p>
                     <p className="text-sm text-gray-600">
                       {new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}
                     </p>
@@ -223,3 +223,5 @@ const EmployeeDashboard = () => {
 }
 
 export default EmployeeDashboard
+
+
