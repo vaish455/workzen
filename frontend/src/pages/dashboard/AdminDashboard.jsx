@@ -4,6 +4,7 @@ import api from '../../services/api'
 import { Users, ClipboardCheck, Calendar, DollarSign, TrendingUp, UserCheck, CircleAlert, ArrowRight } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { DashboardSkeleton } from '../../components/ui/skeletons'
 
 const AdminDashboard = () => {
   const { user } = useAuthStore()
@@ -26,11 +27,7 @@ const AdminDashboard = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   // Mock weekly attendance data - replace with real data from API

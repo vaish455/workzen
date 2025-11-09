@@ -4,11 +4,13 @@ import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { Settings as SettingsIcon, Users, Building, Save } from 'lucide-react'
 import Button from '../../components/ui/button'
+import { ProfileSkeleton } from '../../components/ui/skeletons'
 
 const Settings = () => {
   const { company } = useAuthStore()
   const [activeTab, setActiveTab] = useState('company')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [submitLoading, setSubmitLoading] = useState(false)
   const [companyData, setCompanyData] = useState({
     name: '',
     email: '',
@@ -37,6 +39,8 @@ const Settings = () => {
       setUsers(response.data.data)
     } catch (error) {
       console.error('Failed to fetch users')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -46,7 +50,7 @@ const Settings = () => {
 
   const handleCompanySubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
+    setSubmitLoading(true)
 
     try {
       await api.put(`/companies/${company.id}`, companyData)
@@ -54,7 +58,7 @@ const Settings = () => {
     } catch (error) {
       toast.error('Failed to update company settings')
     } finally {
-      setLoading(false)
+      setSubmitLoading(false)
     }
   }
 
@@ -76,6 +80,10 @@ const Settings = () => {
     } catch (error) {
       toast.error('Failed to update user role')
     }
+  }
+
+  if (loading) {
+    return <ProfileSkeleton />
   }
 
   return (
@@ -185,10 +193,10 @@ const Settings = () => {
               <Button
                 type="submit"
                 variant="primary"
-                disabled={loading}
+                disabled={submitLoading}
                 icon={Save}
               >
-                {loading ? 'Saving...' : 'Save Changes'}
+                {submitLoading ? 'Saving...' : 'Save Changes'}
               </Button>
             </form>
           )}

@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { Play, Search, AlertCircle, TrendingUp, DollarSign, FileText, Users } from 'lucide-react'
 import { format } from 'date-fns'
 import { motion } from 'framer-motion'
+import { StatsCardSkeleton, TableSkeleton } from '../../components/ui/skeletons'
 
 // Memoized payslip row component
 const PayslipRow = memo(({ payslip, onClick, index }) => {
@@ -125,9 +126,21 @@ const Payroll = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-6"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-2" />
+            <div className="h-5 w-48 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+        <StatsCardSkeleton count={3} />
+        <TableSkeleton rows={10} columns={7} />
+      </motion.div>
     )
   }
 

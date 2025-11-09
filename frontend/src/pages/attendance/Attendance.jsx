@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { Calendar as CalendarIcon, Search, Download, Circle, Users, CheckCircle2, XCircle, Plane } from 'lucide-react'
 import { format } from 'date-fns'
 import Button from '../../components/ui/button'
+import { TableSkeleton, StatsCardSkeleton } from '../../components/ui/skeletons'
 
 // Memoized table row component to prevent unnecessary re-renders
 const AttendanceRow = memo(({ item, index }) => {
@@ -108,8 +109,15 @@ const Attendance = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12" style={{ borderWidth: '2px', borderColor: 'var(--color-primary)', borderTopColor: 'transparent' }}></div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-9 w-96 bg-gray-200 rounded animate-pulse mb-2" />
+            <div className="h-5 w-64 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+        <StatsCardSkeleton count={4} />
+        <TableSkeleton rows={10} columns={5} />
       </div>
     )
   }

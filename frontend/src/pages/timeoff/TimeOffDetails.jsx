@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Check, X, FileText, Loader } from 'lucide-react'
+import { DetailsSkeleton } from '../../components/ui/skeletons'
 
 const TimeOffDetails = () => {
   const navigate = useNavigate()
@@ -77,11 +78,7 @@ const TimeOffDetails = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
-      </div>
-    )
+    return <DetailsSkeleton />
   }
 
   if (!leave) return null

@@ -3,6 +3,7 @@ import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { FileText, Download, Loader, Printer } from 'lucide-react'
 import Button from '../../components/ui/button'
+import { ReportSkeleton } from '../../components/ui/skeletons'
 
 const Reports = () => {
   const [loading, setLoading] = useState(false)
