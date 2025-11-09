@@ -61,18 +61,18 @@ const ApplyTimeOff = () => {
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate('/timeoff')}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Apply for Time Off</h1>
-          <p className="text-gray-600">Submit a new time off request</p>
+          <h1 className="text-3xl font-bold text-gray-900">Apply for Time Off</h1>
+          <p className="text-gray-600 mt-1">Submit a new time off request</p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -82,7 +82,7 @@ const ApplyTimeOff = () => {
               name="leaveType"
               value={formData.leaveType}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
               required
             >
               <option value="PAID_TIME_OFF">Paid Time Off</option>
@@ -100,7 +100,7 @@ const ApplyTimeOff = () => {
               name="subject"
               value={formData.subject}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
               placeholder="Brief reason for time off"
               required
             />
@@ -115,7 +115,7 @@ const ApplyTimeOff = () => {
               value={formData.description}
               onChange={handleChange}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
               placeholder="Detailed description..."
             />
           </div>
@@ -130,7 +130,7 @@ const ApplyTimeOff = () => {
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                 required
               />
             </div>
@@ -145,7 +145,7 @@ const ApplyTimeOff = () => {
                 value={formData.endDate}
                 onChange={handleChange}
                 min={formData.startDate}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                 required
               />
             </div>
@@ -156,7 +156,7 @@ const ApplyTimeOff = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Medical Certificate (Optional)
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[#714B67]/50 transition-all duration-200 bg-gray-50/50">
                 <input
                   type="file"
                   accept="image/*,.pdf"
@@ -168,8 +168,8 @@ const ApplyTimeOff = () => {
                   htmlFor="certificate-upload"
                   className="cursor-pointer flex flex-col items-center gap-2"
                 >
-                  <Upload className="w-8 h-8 text-gray-400" />
-                  <span className="text-sm text-gray-600">
+                  <Upload className="w-10 h-10 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700">
                     {certificate ? certificate.name : 'Click to upload certificate'}
                   </span>
                   <span className="text-xs text-gray-500">PNG, JPG or PDF up to 5MB</span>
@@ -187,16 +187,16 @@ const ApplyTimeOff = () => {
               value={formData.note}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
               placeholder="Any additional information..."
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-4">
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-3 bg-[#714B67] text-white rounded-xl hover:bg-[#5A3C52] transition-all duration-200 disabled:bg-[#714B67]/50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-sm hover:shadow-md"
             >
               {loading ? (
                 <>
@@ -210,7 +210,7 @@ const ApplyTimeOff = () => {
             <button
               type="button"
               onClick={() => navigate('/timeoff')}
-              className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all duration-200 font-medium"
             >
               Cancel
             </button>
@@ -222,3 +222,5 @@ const ApplyTimeOff = () => {
 }
 
 export default ApplyTimeOff
+
+

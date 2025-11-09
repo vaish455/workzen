@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { Plus, Search, Filter } from 'lucide-react'
+import Button from '../../components/ui/button'
 
 const TimeOff = () => {
   const navigate = useNavigate()
@@ -74,7 +75,7 @@ const TimeOff = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
       </div>
     )
   }
@@ -84,34 +85,35 @@ const TimeOff = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Time Off Requests</h1>
-          <p className="text-gray-600">{filteredLeaves.length} requests</p>
+          <h1 className="text-3xl font-bold text-gray-900">Time Off Requests</h1>
+          <p className="text-gray-600 mt-1">{filteredLeaves.length} requests</p>
         </div>
-        <button
+        <Button
           onClick={() => navigate('/timeoff/apply')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          variant="primary"
+          icon={Plus}
+          iconPosition="left"
         >
-          <Plus className="w-5 h-5" />
           Apply for Time Off
-        </button>
+        </Button>
       </div>
 
       {/* Filters */}
       <div className="flex gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
             placeholder="Search time off requests..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
         >
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
@@ -127,7 +129,7 @@ const TimeOff = () => {
           <div
             key={leave.id}
             onClick={() => navigate(`/timeoff/${leave.id}`)}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
+            className="bg-white rounded-xl border border-gray-200 p-6 transition-all duration-200 cursor-pointer hover:shadow-lg hover:border-[#714B67]/20"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -138,14 +140,14 @@ const TimeOff = () => {
                         <img
                           src={leave.employee.profilePicture}
                           alt=""
-                          className="w-10 h-10 rounded-full object-cover"
+                          className="w-10 h-10 rounded-xl object-cover"
                         />
                       ) : (
-                        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl flex items-center justify-center text-white font-medium text-sm">
                           {leave.employee.firstName?.charAt(0)}{leave.employee.lastName?.charAt(0)}
                         </div>
                       )}
-                      <span className="font-medium text-gray-800">
+                      <span className="font-medium text-gray-900">
                         {leave.employee.firstName} {leave.employee.lastName}
                       </span>
                     </div>
@@ -158,9 +160,9 @@ const TimeOff = () => {
                   </span>
                 </div>
 
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{leave.subject}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{leave.subject}</h3>
                 {leave.description && (
-                  <p className="text-gray-600 text-sm mb-3">{leave.description}</p>
+                  <p className="text-sm text-gray-600 mb-3">{leave.description}</p>
                 )}
 
                 <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -179,7 +181,7 @@ const TimeOff = () => {
       </div>
 
       {filteredLeaves.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
           <p className="text-gray-500">No time off requests found</p>
         </div>
       )}
@@ -188,3 +190,5 @@ const TimeOff = () => {
 }
 
 export default TimeOff
+
+

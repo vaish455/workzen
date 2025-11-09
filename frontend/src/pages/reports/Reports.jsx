@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { FileText, Download, Loader, Printer } from 'lucide-react'
+import Button from '../../components/ui/button'
 
 const Reports = () => {
   const [loading, setLoading] = useState(false)
@@ -60,12 +61,12 @@ const Reports = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Salary Statement Report</h1>
-        <p className="text-gray-600">Generate annual salary statements for employees</p>
+        <h1 className="text-3xl font-bold text-gray-900">Salary Statement Report</h1>
+        <p className="text-gray-600 mt-1">Generate annual salary statements for employees</p>
       </div>
 
       {/* Report Generation Form */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 print:hidden">
+      <div className="bg-white rounded-xl shadow-sm p-8 print:hidden border border-gray-200">
         <form onSubmit={handleGenerateReport} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -76,7 +77,7 @@ const Reports = () => {
                 name="employeeId"
                 value={formData.employeeId}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                 required
               >
                 <option value="">Choose an employee</option>
@@ -96,7 +97,7 @@ const Reports = () => {
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
                 required
               >
                 {years.map(year => (
@@ -107,23 +108,15 @@ const Reports = () => {
           </div>
 
           <div className="flex gap-3">
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center gap-2"
+              variant="primary"
+              icon={loading ? Loader : FileText}
+              iconPosition="left"
             >
-              {loading ? (
-                <>
-                  <Loader className="w-4 h-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <FileText className="w-4 h-4" />
-                  Generate Report
-                </>
-              )}
-            </button>
+              {loading ? 'Generating...' : 'Generate Report'}
+            </Button>
           </div>
         </form>
       </div>
@@ -132,16 +125,17 @@ const Reports = () => {
       {reportData && (
         <>
           <div className="flex justify-end gap-3 print:hidden">
-            <button
+            <Button
               onClick={handlePrint}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
+              variant="secondary"
+              icon={Printer}
+              iconPosition="left"
             >
-              <Printer className="w-4 h-4" />
               Print
-            </button>
+            </Button>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-200">
             {/* Report Header */}
             <div className="border-b-2 border-gray-300 pb-6 mb-6">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
@@ -223,12 +217,12 @@ const Reports = () => {
             </div>
 
             {/* Summary Section */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Annual Summary</h3>
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-[#714B67]/20 rounded-xl p-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Annual Summary</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Total Gross Earnings</p>
-                  <p className="text-2xl font-bold text-gray-800">
+                  <p className="text-2xl font-bold text-gray-900">
                     ₹{reportData.yearlyTotals.grossWage.toLocaleString()}
                   </p>
                 </div>
@@ -261,7 +255,7 @@ const Reports = () => {
       )}
 
       {!reportData && !loading && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
           <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500">Select an employee and year to generate report</p>
         </div>
@@ -271,3 +265,5 @@ const Reports = () => {
 }
 
 export default Reports
+
+

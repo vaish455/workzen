@@ -3,9 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
-import { Menu, X, User, LogOut, Circle, Clock } from 'lucide-react'
+import { Menu, X, User, LogOut, Circle, Clock, Bell, ChevronDown } from 'lucide-react'
+import Badge from '../ui/badge'
 
-const Navbar = () => {
+const Navbar = ({ isSidebarCollapsed, toggleSidebar }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const { user, company, employee, logout } = useAuthStore()
@@ -115,35 +116,56 @@ const Navbar = () => {
   const canCheckOut = todayAttendance?.canCheckOut
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
+    <nav className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 shadow-sm">
       <div className="px-6 h-16 flex items-center justify-between">
         {/* Left: Company Logo/Name and Page Title */}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             {company?.logo ? (
-              <img src={company.logo} alt={company.name} className="h-8 w-8 rounded" />
+              <img 
+                src={company.logo} 
+                alt={company.name} 
+                className="h-9 w-9 rounded-lg object-cover shadow-sm" 
+              />
             ) : (
-              <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold">
+              <div 
+                className="h-9 w-9 rounded-lg flex items-center justify-center text-white font-bold shadow-sm" 
+                style={{ backgroundColor: 'var(--color-primary)' }}
+              >
                 {company?.name?.charAt(0) || 'W'}
               </div>
             )}
-            <span className="font-semibold text-gray-800">{company?.name || 'WorkZen'}</span>
+            <span className="font-semibold text-gray-900">{company?.name || 'WorkZen'}</span>
           </div>
           <div className="h-6 w-px bg-gray-300" />
           <h1 className="text-lg font-medium text-gray-700">{getPageTitle()}</h1>
         </div>
 
-        {/* Right: Status and Profile */}
-        <div className="flex items-center gap-4">
-          {/* Attendance Status - Only for Employees */}
+        {/* Right: Notifications, Status and Profile */}
+        <div className="flex items-center gap-3">
+          {/* Notifications Button */}
+          <div className="relative">
+            <button
+              className="relative p-2.5 rounded-xl transition-all duration-200 text-gray-400 bg-gray-100 hover:bg-gray-200"
+              aria-label="Notifications"
+            >
+              <Bell className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Attendance Status Badge - Only for Employees */}
           {user?.role === 'EMPLOYEE' && (
             <div className="relative">
               <button
                 onClick={() => setShowAttendanceMenu(!showAttendanceMenu)}
-                className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200"
+                style={{ 
+                  backgroundColor: currentStatus === 'PRESENT' ? 'var(--color-success-light)' : 'var(--color-warning-light)',
+                  color: currentStatus === 'PRESENT' ? 'var(--color-success)' : '#D97706'
+                }}
               >
                 {getStatusIcon(currentStatus)}
-                <span className="text-sm text-gray-700">
+                <span className="text-sm font-medium">
                   {getStatusText(currentStatus)}
                 </span>
               </button>
@@ -155,10 +177,10 @@ const Navbar = () => {
                     className="fixed inset-0 z-10"
                     onClick={() => setShowAttendanceMenu(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
-                    <div className="px-4 py-2 border-b border-gray-200">
-                      <p className="text-sm font-medium text-gray-800">Today's Attendance</p>
-                      <p className="text-xs text-gray-500 mt-1">
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl py-2 z-20 border border-gray-200">
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <p className="text-sm font-semibold text-gray-900">Today's Attendance</p>
+                      <p className="text-xs mt-1 text-gray-500">
                         {new Date().toLocaleDateString('en-US', { 
                           weekday: 'long', 
                           year: 'numeric', 
@@ -172,7 +194,7 @@ const Navbar = () => {
                       {todayAttendance?.attendance?.checkIn && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Check In</span>
-                          <span className="font-medium text-gray-800">
+                          <span className="font-medium text-gray-900">
                             {new Date(todayAttendance.attendance.checkIn).toLocaleTimeString('en-US', {
                               hour: '2-digit',
                               minute: '2-digit',
@@ -184,7 +206,7 @@ const Navbar = () => {
                       {todayAttendance?.attendance?.checkOut && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Check Out</span>
-                          <span className="font-medium text-gray-800">
+                          <span className="font-medium text-gray-900">
                             {new Date(todayAttendance.attendance.checkOut).toLocaleTimeString('en-US', {
                               hour: '2-digit',
                               minute: '2-digit',
@@ -196,15 +218,15 @@ const Navbar = () => {
                       {todayAttendance?.attendance?.workingHours && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Working Hours</span>
-                          <span className="font-medium text-gray-800">
+                          <span className="font-medium text-gray-900">
                             {parseFloat(todayAttendance.attendance.workingHours).toFixed(2)}h
                           </span>
                         </div>
                       )}
 
                       {todayAttendance?.leave && (
-                        <div className="bg-blue-50 border border-blue-200 rounded p-2 mt-2">
-                          <p className="text-xs text-blue-800">
+                        <div className="rounded-xl p-3 mt-2 bg-purple-50 border border-[#714B67]/30">
+                          <p className="text-xs text-[#714B67] font-medium">
                             You are on {todayAttendance.leave.leaveType.replace('_', ' ').toLowerCase()} today
                           </p>
                         </div>
@@ -217,7 +239,10 @@ const Navbar = () => {
                           <button
                             onClick={handleCheckIn}
                             disabled={loading}
-                            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full px-4 py-2.5 text-white rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium shadow-sm"
+                            style={{ backgroundColor: 'var(--color-success)' }}
+                            onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#059669')}
+                            onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = 'var(--color-success)')}
                           >
                             <Clock className="w-4 h-4" />
                             {loading ? 'Checking In...' : 'Check In'}
@@ -228,7 +253,10 @@ const Navbar = () => {
                           <button
                             onClick={handleCheckOut}
                             disabled={loading}
-                            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-red-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full px-4 py-2.5 text-white rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium shadow-sm"
+                            style={{ backgroundColor: 'var(--color-error)' }}
+                            onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#DC2626')}
+                            onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = 'var(--color-error)')}
                           >
                             <Clock className="w-4 h-4" />
                             {loading ? 'Checking Out...' : 'Check Out'}
@@ -242,35 +270,35 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Role Badge - For Admin/HR/Payroll */}
-          {['ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER'].includes(user?.role) && (
-            <div className="px-3 py-1 bg-blue-100 rounded-full">
-              <span className="text-sm font-medium text-blue-800">
-                {user.role.replace('_', ' ')}
-              </span>
-            </div>
-          )}
-
           {/* Profile Menu */}
           <div className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="flex items-center gap-2 hover:bg-gray-100 rounded-lg p-2 transition-colors"
+              className="flex items-center gap-2.5 hover:bg-gray-50 rounded-lg p-2 transition-all duration-200 border border-transparent hover:border-gray-200"
             >
               {employee?.profilePicture ? (
                 <img
                   src={employee.profilePicture}
                   alt={`${employee.firstName} ${employee.lastName}`}
-                  className="w-8 h-8 rounded-full object-cover"
+                  className="w-9 h-9 rounded-lg object-cover border-2 border-gray-200"
                 />
               ) : (
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                <div 
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-sm font-semibold border-2 border-gray-200" 
+                  style={{ backgroundColor: 'var(--color-primary)' }}
+                >
                   {employee?.firstName?.charAt(0)}{employee?.lastName?.charAt(0)}
                 </div>
               )}
-              <span className="text-sm font-medium text-gray-700">
-                {employee?.firstName} {employee?.lastName}
-              </span>
+              <div className="text-left">
+                <p className="text-sm font-medium text-gray-900">
+                  {employee?.firstName} {employee?.lastName}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {user?.role?.replace('_', ' ')}
+                </p>
+              </div>
+              <ChevronDown className="w-4 h-4 text-gray-500" />
             </button>
 
             {/* Dropdown Menu */}
@@ -280,21 +308,21 @@ const Navbar = () => {
                   className="fixed inset-0 z-10"
                   onClick={() => setShowProfileMenu(false)}
                 />
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 z-20 border border-gray-200">
                   <button
                     onClick={() => {
                       navigate('/profile')
                       setShowProfileMenu(false)
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    className="w-full px-4 py-2.5 text-left text-sm flex items-center gap-3 transition-all duration-200 text-gray-700 hover:bg-gray-50"
                   >
                     <User className="w-4 h-4" />
-                    My Profile
+                    <span className="font-medium">My Profile</span>
                   </button>
-                  <hr className="my-2" />
+                  <hr className="border-gray-200 my-1" />
                   <button
                     onClick={handleLogout}
-                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    className="w-full px-4 py-2.5 text-left text-sm text-red-600 flex items-center gap-3 transition-all duration-200 hover:bg-red-50 font-medium"
                   >
                     <LogOut className="w-4 h-4" />
                     Log Out
@@ -310,3 +338,5 @@ const Navbar = () => {
 }
 
 export default Navbar
+
+

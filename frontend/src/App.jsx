@@ -6,6 +6,9 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './store/authStore'
 
+// Landing Page
+import LandingPage from './pages/LandingPage'
+
 // Auth Pages
 import Login from './pages/auth/Login'
 import RegisterAdmin from './pages/auth/RegisterAdmin'
@@ -97,6 +100,11 @@ function App() {
     <>
       <Toaster position="top-right" />
       <Routes>
+        {/* Landing Page - Public Route */}
+        <Route path="/landing" element={
+          !isAuthenticated ? <LandingPage /> : <Navigate to="/" replace />
+        } />
+
         {/* Public Routes */}
         <Route path="/login" element={
           isAuthenticated ? <Navigate to="/" replace /> : <Login />
@@ -109,7 +117,7 @@ function App() {
         <Route 
           path="/" 
           element={
-            isAuthenticated ? <Layout /> : <Navigate to="/login" replace />
+            isAuthenticated ? <Layout /> : <Navigate to="/landing" replace />
           }
         >
           {/* Dashboard */}
@@ -182,3 +190,4 @@ function App() {
 }
 
 export default App
+

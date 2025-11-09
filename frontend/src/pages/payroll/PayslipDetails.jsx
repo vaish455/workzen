@@ -68,7 +68,7 @@ const PayslipDetails = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
       </div>
     )
   }
@@ -85,20 +85,20 @@ const PayslipDetails = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/payroll')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-gray-700" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Payslip Details</h1>
-            <p className="text-gray-600">{payslip.payPeriod}</p>
+            <h1 className="text-3xl font-bold text-gray-900">Payslip Details</h1>
+            <p className="text-gray-600 mt-1">{payslip.payPeriod}</p>
           </div>
         </div>
 
         <div className="flex gap-3">
           <button
             onClick={handlePrint}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
+            className="px-5 py-2.5 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
           >
             <Printer className="w-4 h-4" />
             Print
@@ -108,7 +108,7 @@ const PayslipDetails = () => {
               <button
                 onClick={handleValidate}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 flex items-center gap-2"
+                className="px-5 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all duration-200 disabled:bg-green-400 flex items-center gap-2 shadow-sm hover:shadow-md"
               >
                 <Check className="w-4 h-4" />
                 Validate
@@ -116,7 +116,7 @@ const PayslipDetails = () => {
               <button
                 onClick={handleCancel}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-red-400 flex items-center gap-2"
+                className="px-5 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 disabled:bg-red-400 flex items-center gap-2 shadow-sm hover:shadow-md"
               >
                 <X className="w-4 h-4" />
                 Cancel
@@ -127,16 +127,16 @@ const PayslipDetails = () => {
       </div>
 
       {/* Payslip Content */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         {/* Header */}
         <div className="border-b-2 border-gray-300 pb-6 mb-6">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-gray-800">PAYSLIP</h2>
+              <h2 className="text-3xl font-bold text-gray-900">PAYSLIP</h2>
               <p className="text-gray-600 mt-1">Period: {payslip.payPeriod}</p>
             </div>
             <div className="text-right">
-              <span className={`px-4 py-2 rounded-lg text-sm font-medium ${
+              <span className={`px-4 py-2 rounded-xl text-sm font-medium ${
                 payslip.status === 'DONE' ? 'bg-green-100 text-green-800' :
                 payslip.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
                 'bg-gray-100 text-gray-800'
@@ -263,3 +263,5 @@ const PayslipDetails = () => {
 }
 
 export default PayslipDetails
+
+

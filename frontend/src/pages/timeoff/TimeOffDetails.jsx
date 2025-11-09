@@ -79,7 +79,7 @@ const TimeOffDetails = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
       </div>
     )
   }
@@ -108,13 +108,13 @@ const TimeOffDetails = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/timeoff')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-gray-700" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Time Off Details</h1>
-            <p className="text-gray-600">View and manage time off request</p>
+            <h1 className="text-3xl font-bold text-gray-900">Time Off Details</h1>
+            <p className="text-gray-600 mt-1">View and manage time off request</p>
           </div>
         </div>
 
@@ -125,7 +125,7 @@ const TimeOffDetails = () => {
               <button
                 onClick={handleApprove}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 flex items-center gap-2"
+                className="px-5 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all duration-200 disabled:bg-green-400 flex items-center gap-2 shadow-sm hover:shadow-md"
               >
                 <Check className="w-4 h-4" />
                 Approve
@@ -133,7 +133,7 @@ const TimeOffDetails = () => {
               <button
                 onClick={() => setShowRejectModal(true)}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-red-400 flex items-center gap-2"
+                className="px-5 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 disabled:bg-red-400 flex items-center gap-2 shadow-sm hover:shadow-md"
               >
                 <X className="w-4 h-4" />
                 Reject
@@ -144,7 +144,7 @@ const TimeOffDetails = () => {
             <button
               onClick={handleCancel}
               disabled={actionLoading}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-400"
+              className="px-5 py-2.5 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-all duration-200 disabled:bg-gray-400 shadow-sm hover:shadow-md"
             >
               Cancel Request
             </button>
@@ -153,39 +153,39 @@ const TimeOffDetails = () => {
       </div>
 
       {/* Leave Details */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="flex items-start justify-between mb-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className={`px-4 py-2 rounded-lg text-sm font-medium border ${getStatusColor(leave.status)}`}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className={`px-4 py-2 rounded-xl text-sm font-medium border ${getStatusColor(leave.status)}`}>
                 {leave.status}
               </span>
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
+              <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-xl text-sm font-medium">
                 {leave.leaveType.replace('_', ' ')}
               </span>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">{leave.subject}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{leave.subject}</h2>
           </div>
         </div>
 
         {/* Employee Info (for approvers) */}
         {canApprove && leave.employee && (
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 mb-2">Requested by</p>
+          <div className="mb-6 p-5 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-200">
+            <p className="text-sm text-gray-600 mb-3 font-medium">Requested by</p>
             <div className="flex items-center gap-3">
               {leave.employee.profilePicture ? (
                 <img
                   src={leave.employee.profilePicture}
                   alt=""
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="w-12 h-12 rounded-xl object-cover"
                 />
               ) : (
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium text-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl flex items-center justify-center text-white font-medium text-lg shadow-lg shadow-[#714B67]/20">
                   {leave.employee.firstName?.charAt(0)}{leave.employee.lastName?.charAt(0)}
                 </div>
               )}
               <div>
-                <p className="font-semibold text-gray-800">
+                <p className="font-semibold text-gray-900">
                   {leave.employee.firstName} {leave.employee.lastName}
                 </p>
                 <p className="text-sm text-gray-600">{leave.employee.email}</p>
@@ -197,8 +197,8 @@ const TimeOffDetails = () => {
         {/* Details Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <p className="text-sm text-gray-600 mb-1">Start Date</p>
-            <p className="font-medium text-gray-800">
+            <p className="text-sm text-gray-600 mb-2 font-medium">Start Date</p>
+            <p className="font-semibold text-gray-900">
               {new Date(leave.startDate).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
@@ -208,8 +208,8 @@ const TimeOffDetails = () => {
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 mb-1">End Date</p>
-            <p className="font-medium text-gray-800">
+            <p className="text-sm text-gray-600 mb-2 font-medium">End Date</p>
+            <p className="font-semibold text-gray-900">
               {new Date(leave.endDate).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
@@ -219,12 +219,12 @@ const TimeOffDetails = () => {
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 mb-1">Total Days</p>
-            <p className="font-medium text-gray-800">{leave.totalDays} day(s)</p>
+            <p className="text-sm text-gray-600 mb-2 font-medium">Total Days</p>
+            <p className="font-semibold text-gray-900">{leave.totalDays} day(s)</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 mb-1">Applied On</p>
-            <p className="font-medium text-gray-800">
+            <p className="text-sm text-gray-600 mb-2 font-medium">Applied On</p>
+            <p className="font-semibold text-gray-900">
               {new Date(leave.createdAt).toLocaleDateString()}
             </p>
           </div>
@@ -233,28 +233,28 @@ const TimeOffDetails = () => {
         {/* Description */}
         {leave.description && (
           <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">Description</p>
-            <p className="text-gray-800">{leave.description}</p>
+            <p className="text-sm text-gray-600 mb-2 font-medium">Description</p>
+            <p className="text-gray-900">{leave.description}</p>
           </div>
         )}
 
         {/* Note */}
         {leave.note && (
           <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">Additional Note</p>
-            <p className="text-gray-800">{leave.note}</p>
+            <p className="text-sm text-gray-600 mb-2 font-medium">Additional Note</p>
+            <p className="text-gray-900">{leave.note}</p>
           </div>
         )}
 
         {/* Certificate */}
         {leave.certificate && (
           <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">Medical Certificate</p>
+            <p className="text-sm text-gray-600 mb-2 font-medium">Medical Certificate</p>
             <a
               href={leave.certificate}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             >
               <FileText className="w-4 h-4" />
               View Certificate
@@ -264,9 +264,9 @@ const TimeOffDetails = () => {
 
         {/* Rejection Reason */}
         {leave.status === 'REJECTED' && leave.rejectionReason && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600 font-medium mb-1">Rejection Reason</p>
-            <p className="text-red-800">{leave.rejectionReason}</p>
+          <div className="p-5 bg-red-50 border border-red-200 rounded-xl">
+            <p className="text-sm text-red-600 font-medium mb-2">Rejection Reason</p>
+            <p className="text-red-900">{leave.rejectionReason}</p>
           </div>
         )}
 
@@ -283,28 +283,28 @@ const TimeOffDetails = () => {
 
       {/* Rejection Modal */}
       {showRejectModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Reject Time Off Request</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Reject Time Off Request</h3>
             <textarea
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="Enter rejection reason..."
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all mb-4 text-gray-900"
             />
             <div className="flex gap-3">
               <button
                 onClick={handleReject}
                 disabled={actionLoading || !rejectionReason}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-red-400 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 disabled:bg-red-400 disabled:cursor-not-allowed font-medium shadow-sm hover:shadow-md"
               >
                 {actionLoading ? 'Rejecting...' : 'Confirm Rejection'}
               </button>
               <button
                 onClick={() => setShowRejectModal(false)}
                 disabled={actionLoading}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all duration-200 font-medium"
               >
                 Cancel
               </button>
@@ -317,3 +317,5 @@ const TimeOffDetails = () => {
 }
 
 export default TimeOffDetails
+
+

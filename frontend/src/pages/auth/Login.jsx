@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import toast from 'react-hot-toast'
 import { LogIn, Loader } from 'lucide-react'
+import Button from '../../components/ui/button'
+import { motion } from 'framer-motion'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -41,21 +43,37 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#FFE5EC] via-[#F3E5F5] to-[#E1F5FE]">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+        className="bg-white rounded-xl shadow-lg border border-gray-200 w-full max-w-md p-8"
+      >
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-block p-3 bg-blue-600 rounded-full mb-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="text-center mb-8"
+        >
+          <div className="w-16 h-16 bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#714B67]/20">
             <LogIn className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">WorkZen</h1>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
-        </div>
+          <h1 className="text-3xl font-bold text-gray-900">WorkZen</h1>
+          <p className="mt-2 text-gray-600">Welcome back! Please login to continue</p>
+        </motion.div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <motion.form
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
           <div>
-            <label htmlFor="loginId" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="loginId" className="block text-sm font-medium mb-2 text-gray-700">
               Login ID
             </label>
             <input
@@ -64,14 +82,14 @@ const Login = () => {
               name="loginId"
               value={formData.loginId}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
               placeholder="Enter your login ID"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium mb-2 text-gray-700">
               Password
             </label>
             <input
@@ -80,7 +98,7 @@ const Login = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900"
               placeholder="Enter your password"
               required
             />
@@ -89,7 +107,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#714B67] text-white font-medium rounded-lg hover:bg-[#5A3C52] focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
           >
             {loading ? (
               <>
@@ -97,21 +115,30 @@ const Login = () => {
                 Signing in...
               </>
             ) : (
-              'Sign In'
+              <>
+                <LogIn className="w-5 h-5" />
+                Sign In
+              </>
             )}
           </button>
-        </form>
+        </motion.form>
 
         {/* Footer */}
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-6 text-center text-sm text-gray-600"
+        >
           Don't have an account?{' '}
-          <Link to="/register-admin" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link to="/register-admin" className="font-medium text-[#714B67] hover:text-[#5A3C52] hover:underline">
             Register as Admin
           </Link>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }
 
 export default Login
+

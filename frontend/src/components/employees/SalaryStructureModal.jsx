@@ -613,3 +613,4 @@ const SalaryStructureModal = ({ isOpen, onClose, employee, onSuccess }) => {
 }
 
 export default SalaryStructureModal
+

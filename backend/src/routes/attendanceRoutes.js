@@ -1,7 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import { validate } from '../middleware/validate.js';
-import { authenticate, isHROrAdmin } from '../middleware/auth.js';
+import { authenticate, authorize } from '../middleware/auth.js';
 import {
   checkIn,
   checkOut,
@@ -26,8 +26,8 @@ router.post('/check-in', authenticate, checkIn);
 router.post('/check-out', authenticate, checkOut);
 router.get('/my-attendance', authenticate, getMyAttendance);
 router.get('/today', authenticate, getTodayAttendance);
-router.get('/all', authenticate, isHROrAdmin, getAllAttendance);
-router.get('/employee/:employeeId', authenticate, isHROrAdmin, getEmployeeAttendance);
-router.post('/mark', authenticate, isHROrAdmin, markAttendanceValidation, validate, markAttendance);
+router.get('/all', authenticate, authorize('ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER'), getAllAttendance);
+router.get('/employee/:employeeId', authenticate, authorize('ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER'), getEmployeeAttendance);
+router.post('/mark', authenticate, authorize('ADMIN', 'HR_OFFICER'), markAttendanceValidation, validate, markAttendance);
 
 export default router;
