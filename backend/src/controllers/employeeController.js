@@ -89,16 +89,21 @@ export const getAllEmployees = async (req, res, next) => {
         });
         
         let attendanceStatus = 'ABSENT';
+        let isCurrentlyInOffice = false;
+        
         if (leave) {
           attendanceStatus = 'ON_LEAVE';
         } else if (attendance?.status === 'PRESENT') {
           attendanceStatus = 'PRESENT';
+          isCurrentlyInOffice = attendance.currentlyCheckedIn || false;
         }
         
         return {
           ...emp,
           attendanceStatus,
+          isCurrentlyInOffice,
           currentAttendance: attendance,
+          onLeave: leave ? true : false,
         };
       })
     );

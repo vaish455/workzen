@@ -19,6 +19,9 @@ const Settings = () => {
     website: '',
   })
   const [users, setUsers] = useState([])
+  const [showDeactivationDialog, setShowDeactivationDialog] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [deactivationReason, setDeactivationReason] = useState('')
 
   useEffect(() => {
     if (company) {
@@ -63,13 +66,54 @@ const Settings = () => {
   }
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
+    // If deactivating, show dialog to get reason
+    if (currentStatus) {
+      const user = users.find(u => u.id === userId)
+      setSelectedUser({ id: userId, ...user })
+      setShowDeactivationDialog(true)
+      return
+    }
+
+    // If activating, do it directly
     try {
-      await api.put(`/users/${userId}/status`, { isActive: !currentStatus })
-      toast.success(`User ${!currentStatus ? 'activated' : 'deactivated'} successfully`)
+      await api.put(`/users/${userId}/status`, { isActive: true })
+      toast.success('User activated successfully')
       fetchUsers()
     } catch (error) {
-      toast.error('Failed to update user status')
+      toast.error(error.response?.data?.message || 'Failed to update user status')
     }
+  }
+
+  const handleConfirmDeactivation = async () => {
+    if (!deactivationReason.trim()) {
+      toast.error('Please provide a reason for deactivation')
+      return
+    }
+
+    if (deactivationReason.trim().length < 5) {
+      toast.error('Deactivation reason must be at least 5 characters')
+      return
+    }
+
+    try {
+      await api.put(`/users/${selectedUser.id}/status`, { 
+        isActive: false,
+        deactivationReason: deactivationReason.trim()
+      })
+      toast.success('User deactivated successfully')
+      setShowDeactivationDialog(false)
+      setDeactivationReason('')
+      setSelectedUser(null)
+      fetchUsers()
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to deactivate user')
+    }
+  }
+
+  const handleCancelDeactivation = () => {
+    setShowDeactivationDialog(false)
+    setDeactivationReason('')
+    setSelectedUser(null)
   }
 
   const handleChangeUserRole = async (userId, newRole) => {
@@ -267,16 +311,29 @@ const Settings = () => {
                             <option value="ADMIN">Admin</option>
                           </select>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span 
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              user.isActive
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                            }`}
-                          >
-                            {user.isActive ? 'Active' : 'Inactive'}
-                          </span>
+                        <td className="px-6 py-4">
+                          <div className="space-y-1">
+                            <span 
+                              className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                                user.isActive
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {user.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                            {!user.isActive && user.deactivationReason && (
+                              <div className="text-xs text-gray-600 mt-1">
+                                <span className="font-medium">Reason: </span>
+                                {user.deactivationReason}
+                              </div>
+                            )}
+                            {!user.isActive && user.deactivatedAt && (
+                              <div className="text-xs text-gray-500">
+                                Deactivated: {new Date(user.deactivatedAt).toLocaleDateString()}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
@@ -298,10 +355,66 @@ const Settings = () => {
           )}
         </div>
       </div>
+
+      {/* Deactivation Reason Dialog */}
+      {showDeactivationDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
+            <h2 className="text-2xl font-bold text-gray-900">Deactivate User</h2>
+            
+            <div className="space-y-2">
+              <p className="text-gray-700">
+                You are about to deactivate{' '}
+                <span className="font-semibold">
+                  {selectedUser?.employee?.firstName} {selectedUser?.employee?.lastName}
+                </span>
+              </p>
+              <p className="text-sm text-gray-600">
+                Please provide a reason for this action. This will be recorded for future reference.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reason for Deactivation *
+              </label>
+              <textarea
+                value={deactivationReason}
+                onChange={(e) => setDeactivationReason(e.target.value)}
+                placeholder="e.g., Contract ended, Policy violation, Resignation..."
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#714B67]/20 focus:border-[#714B67] transition-all bg-white text-gray-900 resize-none"
+                autoFocus
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Minimum 5 characters required
+              </p>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={handleCancelDeactivation}
+                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDeactivation}
+                disabled={!deactivationReason.trim() || deactivationReason.trim().length < 5}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Deactivate User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 export default Settings
+
+
 
 

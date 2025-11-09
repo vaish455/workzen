@@ -107,6 +107,53 @@ const Attendance = () => {
     })
   }, [attendanceData, searchQuery])
 
+  const exportToCSV = () => {
+    if (!attendanceData?.attendances || attendanceData.attendances.length === 0) {
+      toast.error('No data to export')
+      return
+    }
+
+    // CSV Header
+    const headers = ['Employee Name', 'Status', 'Check In', 'Check Out', 'Working Hours']
+    
+    // CSV Rows
+    const rows = filteredAttendances.map(item => {
+      const employeeName = `${item.employee.firstName} ${item.employee.lastName}`
+      const status = item.status.replace('_', ' ')
+      const checkIn = item.attendance?.checkIn 
+        ? new Date(item.attendance.checkIn).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        : '-'
+      const checkOut = item.attendance?.checkOut 
+        ? new Date(item.attendance.checkOut).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        : '-'
+      const workingHours = item.attendance?.workingHours 
+        ? `${parseFloat(item.attendance.workingHours).toFixed(2)}h`
+        : '-'
+      
+      return [employeeName, status, checkIn, checkOut, workingHours]
+    })
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n')
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    
+    link.setAttribute('href', url)
+    link.setAttribute('download', `attendance_${selectedDate}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    toast.success('Attendance data exported successfully')
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -135,7 +182,7 @@ const Attendance = () => {
           </p>
         </div>
         <button
-          onClick={() => {}}
+          onClick={exportToCSV}
           className="inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-[#714B67] text-white hover:bg-[#5A3C52] focus-visible:ring-[#714B67] shadow-sm px-4 py-2.5 text-base gap-2"
         >
           <Download className="w-5 h-5" />

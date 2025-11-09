@@ -206,6 +206,8 @@ export const getAllUsers = async (req, res, next) => {
         email: user.email,
         role: user.role,
         isActive: user.isActive,
+        deactivationReason: user.deactivationReason,
+        deactivatedAt: user.deactivatedAt,
         employee: user.employee,
       })),
     });
@@ -319,7 +321,7 @@ export const updateUserRole = async (req, res, next) => {
 export const toggleUserStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { isActive } = req.body;
+    const { isActive, deactivationReason } = req.body;
     const currentUser = req.user;
     
     // Prevent self-deactivation
@@ -327,6 +329,14 @@ export const toggleUserStatus = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: 'You cannot deactivate your own account',
+      });
+    }
+
+    // Validate deactivation reason if deactivating
+    if (!isActive && !deactivationReason) {
+      return res.status(400).json({
+        success: false,
+        message: 'Deactivation reason is required',
       });
     }
     
@@ -348,10 +358,17 @@ export const toggleUserStatus = async (req, res, next) => {
       });
     }
     
+    // Prepare update data
+    const updateData = {
+      isActive,
+      deactivationReason: !isActive ? deactivationReason : null,
+      deactivatedAt: !isActive ? new Date() : null,
+    };
+    
     // Update status
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: { isActive },
+      data: updateData,
     });
     
     // Send account locked email if deactivating
@@ -361,7 +378,7 @@ export const toggleUserStatus = async (req, res, next) => {
         await sendAccountLockedEmail(
           user.email,
           userName,
-          'Account deactivated by administrator',
+          deactivationReason,
           new Date()
         );
       } catch (emailError) {
@@ -375,6 +392,8 @@ export const toggleUserStatus = async (req, res, next) => {
       data: {
         id: updatedUser.id,
         isActive: updatedUser.isActive,
+        deactivationReason: updatedUser.deactivationReason,
+        deactivatedAt: updatedUser.deactivatedAt,
       },
     });
   } catch (error) {

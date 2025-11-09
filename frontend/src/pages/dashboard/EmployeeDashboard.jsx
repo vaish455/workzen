@@ -109,6 +109,42 @@ const EmployeeDashboard = () => {
         </div>
       </div>
 
+      {/* Leave Balance Summary Banner */}
+      {dashboardData?.leaveBalances && dashboardData.leaveBalances.length > 0 && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-sm p-6 border border-blue-100">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Your Remaining Leaves</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {dashboardData.leaveBalances.map((balance) => (
+                  <div key={balance.id} className="bg-white rounded-lg p-4 shadow-sm">
+                    <p className="text-sm text-gray-600 mb-1 capitalize">
+                      {balance.leaveType.replace(/_/g, ' ').toLowerCase()}
+                    </p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-bold text-[#714B67]">{balance.remainingDays}</span>
+                      <span className="text-sm text-gray-500">/ {balance.totalDays} days</span>
+                    </div>
+                    <div className="mt-2 bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="bg-[#714B67] h-full rounded-full transition-all duration-300"
+                        style={{ width: `${(balance.remainingDays / balance.totalDays) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/timeoff/apply')}
+              className="ml-4 bg-[#714B67] text-white px-5 py-2.5 rounded-lg font-medium hover:bg-[#5A3C52] transition-all duration-200 shadow-sm whitespace-nowrap"
+            >
+              Apply Leave
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-[#714B67]/20 transition-all duration-200">
@@ -130,7 +166,7 @@ const EmployeeDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-[#714B67]/20 transition-all duration-200">
+        {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-[#714B67]/20 transition-all duration-200">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-3 bg-blue-100 rounded-xl">
               <Calendar className="w-5 h-5 text-blue-600" />
@@ -138,16 +174,23 @@ const EmployeeDashboard = () => {
             <h3 className="font-semibold text-gray-900">Leave Balance</h3>
           </div>
           <div className="space-y-2">
-            {dashboardData?.leaveBalances?.map((balance) => (
-              <div key={balance.id} className="flex justify-between text-sm">
-                <span className="text-gray-600">
-                  {balance.leaveType.replace('_', ' ')}
-                </span>
-                <span className="font-medium text-gray-900">{balance.remainingDays} days</span>
-              </div>
-            ))}
+            {dashboardData?.leaveBalances && dashboardData.leaveBalances.length > 0 ? (
+              dashboardData.leaveBalances.map((balance) => (
+                <div key={balance.id} className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600 capitalize">
+                    {balance.leaveType.replace(/_/g, ' ').toLowerCase()}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-lg text-[#714B67]">{balance.remainingDays}</span>
+                    <span className="text-gray-500 text-xs">/ {balance.totalDays} days</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No leave balance available</p>
+            )}
           </div>
-        </div>
+        </div> */}
 
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-[#714B67]/20 transition-all duration-200">
           <div className="flex items-center gap-3 mb-3">

@@ -34,7 +34,7 @@ const salaryValidation = [
 ];
 
 // Routes
-router.get('/', authenticate, getAllEmployees);
+router.get('/', authenticate, getAllEmployees); // All authenticated users can view directory
 router.get('/:id', authenticate, getEmployeeById);
 router.put('/:id', authenticate, updateEmployeeValidation, validate, updateEmployee);
 router.put('/:id/profile-picture', authenticate, uploadSingle('profilePicture'), uploadProfilePicture);
