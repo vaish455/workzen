@@ -106,6 +106,20 @@ const LandingPage = () => {
       <div className="relative pt-24 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
+            {/* Logo */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex justify-center mb-8"
+            >
+              <img 
+                src="/logo-unscreen.gif" 
+                alt="WorkZen Logo" 
+                className=" h-64 w-64 object-contain"
+              />
+            </motion.div>
+
             {/* Animated Title with Blur Effect */}
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
               {['Simplify', 'Your', 'Workforce', 'Management'].map((word, index) => (
