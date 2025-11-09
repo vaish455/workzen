@@ -3,6 +3,7 @@ import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { Calendar as CalendarIcon, Clock, TrendingUp } from 'lucide-react'
 import { format } from 'date-fns'
+import { StatsCardSkeleton, TableSkeleton } from '../../components/ui/skeletons'
 
 const MyAttendance = () => {
   const [loading, setLoading] = useState(true)
@@ -76,8 +77,11 @@ const MyAttendance = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
+      <div className="space-y-6">
+        <div className="h-9 w-64 bg-gray-200 rounded animate-pulse mb-2" />
+        <div className="h-32 w-full bg-gray-200 rounded-xl animate-pulse" />
+        <StatsCardSkeleton count={4} />
+        <TableSkeleton rows={8} columns={4} />
       </div>
     )
   }

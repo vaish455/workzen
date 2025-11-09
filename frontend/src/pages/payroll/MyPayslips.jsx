@@ -4,6 +4,7 @@ import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { FileText, Download } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { CardGridSkeleton } from '../../components/ui/skeletons'
 
 const MyPayslips = () => {
   const navigate = useNavigate()
@@ -34,9 +35,18 @@ const MyPayslips = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-6"
+      >
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+          <div className="h-10 w-32 bg-gray-200 rounded-xl animate-pulse" />
+        </div>
+        <CardGridSkeleton count={6} />
+      </motion.div>
     )
   }
 

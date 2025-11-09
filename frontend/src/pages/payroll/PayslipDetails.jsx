@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Check, X, Printer, FileText } from 'lucide-react'
+import { DetailsSkeleton } from '../../components/ui/skeletons'
 
 const PayslipDetails = () => {
   const navigate = useNavigate()
@@ -97,6 +98,10 @@ const PayslipDetails = () => {
         style.remove()
       }
     }, 100)
+  }
+
+  if (loading) {
+    return <DetailsSkeleton />
   }
 
   if (loading) {

@@ -66,7 +66,7 @@ async function main() {
   console.log('🏢 Creating test company...');
   const company = await prisma.company.create({
     data: {
-      name: 'TestCorp Solutions (SEED DATA)',
+      name: 'TestCorp Solutions',
       email: 'info@testcorp.com',
       phone: '+1-555-TEST',
     },

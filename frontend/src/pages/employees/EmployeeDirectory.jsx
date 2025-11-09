@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import Button from '../../components/ui/button'
 import Badge from '../../components/ui/badge'
 import { motion, AnimatePresence } from 'framer-motion'
+import { CardGridSkeleton } from '../../components/ui/skeletons'
 
 // Memoized employee card component
 const EmployeeCard = memo(({ emp, onClick }) => {
@@ -100,11 +101,7 @@ const EmployeeDirectory = () => {
   }, [employees, searchQuery, statusFilter])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12" style={{ borderWidth: '2px', borderColor: 'var(--color-primary)', borderTopColor: 'transparent' }}></div>
-      </div>
-    )
+    return <CardGridSkeleton count={9} />
   }
 
   return (

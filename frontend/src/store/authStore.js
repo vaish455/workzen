@@ -7,6 +7,31 @@ export const useAuthStore = create((set) => ({
   employee: null,
   isAuthenticated: false,
 
+  register: async (data) => {
+    try {
+      const response = await api.post('/auth/register-admin', data)
+      const { token, user, company, employee } = response.data.data
+
+      localStorage.setItem('token', token)
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+      set({
+        user,
+        company,
+        employee,
+        isAuthenticated: true,
+      })
+
+      return { success: true, data: response.data }
+    } catch (error) {
+      console.error('Registration error:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Registration failed',
+      }
+    }
+  },
+
   login: async (loginId, password) => {
     const response = await api.post('/auth/login', { loginId, password })
     const { token, user, company, employee } = response.data.data

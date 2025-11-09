@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { ArrowLeft, Mail, Phone, Calendar, DollarSign, Edit, User, CreditCard, Building2 } from 'lucide-react'
 import SalaryStructureModal from '../../components/employees/SalaryStructureModal'
 import { motion } from 'framer-motion'
+import { DetailsSkeleton } from '../../components/ui/skeletons'
 
 const EmployeeDetails = () => {
   const navigate = useNavigate()
@@ -32,11 +33,7 @@ const EmployeeDetails = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
-      </div>
-    )
+    return <DetailsSkeleton />
   }
 
   if (!employee) {

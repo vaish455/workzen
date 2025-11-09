@@ -5,6 +5,7 @@ import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { Plus, Search, Filter } from 'lucide-react'
 import Button from '../../components/ui/button'
+import { ListSkeleton } from '../../components/ui/skeletons'
 
 const TimeOff = () => {
   const navigate = useNavigate()
@@ -74,8 +75,19 @@ const TimeOff = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#714B67] border-t-transparent"></div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-9 w-64 bg-gray-200 rounded animate-pulse mb-2" />
+            <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
+          </div>
+          <div className="h-11 w-48 bg-gray-200 rounded-xl animate-pulse" />
+        </div>
+        <div className="flex gap-4">
+          <div className="flex-1 h-12 bg-gray-200 rounded-lg animate-pulse" />
+          <div className="h-12 w-40 bg-gray-200 rounded-lg animate-pulse" />
+        </div>
+        <ListSkeleton count={8} />
       </div>
     )
   }

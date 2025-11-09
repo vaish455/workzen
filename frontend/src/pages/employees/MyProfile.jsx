@@ -3,11 +3,12 @@ import { useAuthStore } from '../../store/authStore'
 import api from '../../services/api'
 import toast from 'react-hot-toast'
 import { Camera, Save, Lock } from 'lucide-react'
+import { ProfileSkeleton } from '../../components/ui/skeletons'
 
 const MyProfile = () => {
   const { user, employee, updateProfile } = useAuthStore()
   const [activeTab, setActiveTab] = useState('personal')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [profileData, setProfileData] = useState({
     firstName: '',
     lastName: '',
@@ -56,6 +57,7 @@ const MyProfile = () => {
         uanNumber: employee.uanNumber || '',
         employeeCode: employee.employeeCode || '',
       })
+      setLoading(false)
     }
   }, [employee])
 
@@ -173,6 +175,10 @@ const MyProfile = () => {
     } catch (error) {
       toast.error('Failed to upload profile picture')
     }
+  }
+
+  if (loading) {
+    return <ProfileSkeleton />
   }
 
   return (
