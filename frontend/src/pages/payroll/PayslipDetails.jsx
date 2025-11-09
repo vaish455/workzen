@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import api from '../../services/api'
@@ -12,6 +12,7 @@ const PayslipDetails = () => {
   const [loading, setLoading] = useState(true)
   const [payslip, setPayslip] = useState(null)
   const [actionLoading, setActionLoading] = useState(false)
+  const payslipRef = useRef()
 
   const canManage = ['ADMIN', 'PAYROLL_OFFICER'].includes(user?.role)
 
@@ -62,7 +63,40 @@ const PayslipDetails = () => {
   }
 
   const handlePrint = () => {
+    // Add print styles dynamically
+    const printStyle = document.createElement('style')
+    printStyle.id = 'payslip-print-style'
+    printStyle.innerHTML = `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #payslip-content, #payslip-content * {
+          visibility: visible;
+        }
+        #payslip-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+        @page {
+          margin: 0.5cm;
+        }
+      }
+    `
+    document.head.appendChild(printStyle)
+    
+    // Trigger print
     window.print()
+    
+    // Remove print styles after printing
+    setTimeout(() => {
+      const style = document.getElementById('payslip-print-style')
+      if (style) {
+        style.remove()
+      }
+    }, 100)
   }
 
   if (loading) {
@@ -127,7 +161,14 @@ const PayslipDetails = () => {
       </div>
 
       {/* Payslip Content */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+      <div id="payslip-content" ref={payslipRef} className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        {/* Company Name */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-[#714B67]">
+            {user?.company?.name}
+          </h1>
+        </div>
+
         {/* Header */}
         <div className="border-b-2 border-gray-300 pb-6 mb-6">
           <div className="flex items-start justify-between">

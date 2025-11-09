@@ -137,13 +137,21 @@ function App() {
           <Route path="profile" element={<MyProfile />} />
           
           {/* Employees */}
-          <Route path="employees" element={<EmployeeDirectory />} />
+          <Route path="employees" element={
+            <ProtectedRoute roles={['ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER']}>
+              <EmployeeDirectory />
+            </ProtectedRoute>
+          } />
           <Route path="employees/add" element={
             <ProtectedRoute roles={['ADMIN']}>
               <AddEmployee />
             </ProtectedRoute>
           } />
-          <Route path="employees/:id" element={<EmployeeDetails />} />
+          <Route path="employees/:id" element={
+            <ProtectedRoute roles={['ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER']}>
+              <EmployeeDetails />
+            </ProtectedRoute>
+          } />
           
           {/* Attendance */}
           <Route path="attendance" element={

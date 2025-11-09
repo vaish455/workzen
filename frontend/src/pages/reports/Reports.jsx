@@ -51,7 +51,40 @@ const Reports = () => {
   }
 
   const handlePrint = () => {
+    // Add print styles dynamically
+    const printStyle = document.createElement('style')
+    printStyle.id = 'report-print-style'
+    printStyle.innerHTML = `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #report-content, #report-content * {
+          visibility: visible;
+        }
+        #report-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+        @page {
+          margin: 0.5cm;
+        }
+      }
+    `
+    document.head.appendChild(printStyle)
+    
+    // Trigger print
     window.print()
+    
+    // Remove print styles after printing
+    setTimeout(() => {
+      const style = document.getElementById('report-print-style')
+      if (style) {
+        style.remove()
+      }
+    }, 100)
   }
 
   const currentYear = new Date().getFullYear()
@@ -135,7 +168,7 @@ const Reports = () => {
             </Button>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-200">
+          <div id="report-content" className="bg-white rounded-xl shadow-sm p-8 border border-gray-200">
             {/* Report Header */}
             <div className="border-b-2 border-gray-300 pb-6 mb-6">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
