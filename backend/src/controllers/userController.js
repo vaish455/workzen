@@ -121,8 +121,6 @@ export const createUser = async (req, res, next) => {
         email,
         `${firstName} ${lastName}`,
         loginId,
-        role === 'EMPLOYEE' ? 'General' : role.replace('_', ' '),
-        loginId,
         randomPassword
       );
     } catch (emailError) {
