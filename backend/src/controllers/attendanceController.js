@@ -20,7 +20,7 @@ export const checkIn = async (req, res, next) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // Check if already checked in today
+    // Get existing attendance record for today
     const existingAttendance = await prisma.attendance.findFirst({
       where: {
         employeeId,
@@ -28,13 +28,27 @@ export const checkIn = async (req, res, next) => {
       },
     });
     
-    if (existingAttendance && existingAttendance.checkIn) {
+    // Check if currently checked in
+    if (existingAttendance && existingAttendance.currentlyCheckedIn) {
       return res.status(400).json({
         success: false,
-        message: 'Already checked in today',
+        message: 'You are already checked in. Please check out first.',
         data: existingAttendance,
       });
     }
+    
+    const checkInTime = new Date();
+    
+    // Get existing sessions or initialize empty array
+    let sessions = existingAttendance?.sessions ? 
+      (Array.isArray(existingAttendance.sessions) ? existingAttendance.sessions : []) : 
+      [];
+    
+    // Add new check-in session
+    sessions.push({
+      checkIn: checkInTime.toISOString(),
+      checkOut: null
+    });
     
     // Create or update attendance
     const attendance = await prisma.attendance.upsert({
@@ -47,12 +61,16 @@ export const checkIn = async (req, res, next) => {
       create: {
         employeeId,
         date: today,
-        checkIn: new Date(),
+        checkIn: checkInTime,
         status: 'PRESENT',
+        currentlyCheckedIn: true,
+        sessions: sessions,
       },
       update: {
-        checkIn: new Date(),
+        checkIn: existingAttendance?.checkIn || checkInTime, // Keep first check-in time
         status: 'PRESENT',
+        currentlyCheckedIn: true,
+        sessions: sessions,
       },
     });
     
@@ -100,31 +118,47 @@ export const checkOut = async (req, res, next) => {
       });
     }
     
-    if (!attendance.checkIn) {
+    if (!attendance.currentlyCheckedIn) {
       return res.status(400).json({
         success: false,
-        message: 'Please check in first',
-      });
-    }
-    
-    if (attendance.checkOut) {
-      return res.status(400).json({
-        success: false,
-        message: 'Already checked out today',
+        message: 'You are not currently checked in',
         data: attendance,
       });
     }
     
-    // Calculate working hours
     const checkOutTime = new Date();
-    const workingHours = calculateWorkingHours(attendance.checkIn, checkOutTime);
+    
+    // Get existing sessions
+    let sessions = attendance.sessions ? 
+      (Array.isArray(attendance.sessions) ? attendance.sessions : []) : 
+      [];
+    
+    // Find the last session without checkout and update it
+    for (let i = sessions.length - 1; i >= 0; i--) {
+      if (!sessions[i].checkOut) {
+        sessions[i].checkOut = checkOutTime.toISOString();
+        break;
+      }
+    }
+    
+    // Calculate total working hours from all sessions
+    let totalWorkingHours = 0;
+    sessions.forEach(session => {
+      if (session.checkIn && session.checkOut) {
+        const checkIn = new Date(session.checkIn);
+        const checkOut = new Date(session.checkOut);
+        totalWorkingHours += calculateWorkingHours(checkIn, checkOut);
+      }
+    });
     
     // Update attendance
     const updatedAttendance = await prisma.attendance.update({
       where: { id: attendance.id },
       data: {
         checkOut: checkOutTime,
-        workingHours,
+        workingHours: totalWorkingHours,
+        currentlyCheckedIn: false,
+        sessions: sessions,
       },
     });
     
@@ -429,8 +463,9 @@ export const getTodayAttendance = async (req, res, next) => {
         attendance,
         leave,
         status,
-        canCheckIn: !attendance?.checkIn && !leave,
-        canCheckOut: attendance?.checkIn && !attendance?.checkOut,
+        canCheckIn: !attendance?.currentlyCheckedIn && !leave,
+        canCheckOut: attendance?.currentlyCheckedIn,
+        isCurrentlyInOffice: attendance?.currentlyCheckedIn || false,
       },
     });
   } catch (error) {

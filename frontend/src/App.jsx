@@ -136,12 +136,8 @@ function App() {
           {/* Profile */}
           <Route path="profile" element={<MyProfile />} />
           
-          {/* Employees */}
-          <Route path="employees" element={
-            <ProtectedRoute roles={['ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER']}>
-              <EmployeeDirectory />
-            </ProtectedRoute>
-          } />
+          {/* Employees - All users can view directory */}
+          <Route path="employees" element={<EmployeeDirectory />} />
           <Route path="employees/add" element={
             <ProtectedRoute roles={['ADMIN']}>
               <AddEmployee />

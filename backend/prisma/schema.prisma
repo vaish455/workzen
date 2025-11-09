@@ -93,6 +93,8 @@ model User {
   role              UserRole
   companyId         String
   isActive          Boolean   @default(true)
+  deactivationReason String?
+  deactivatedAt     DateTime?
   lastLogin         DateTime?
   passwordResetToken String?
   passwordResetExpires DateTime?
@@ -199,6 +201,14 @@ model Attendance {
   status        AttendanceStatus  @default(ABSENT)
   workingHours  Decimal?          @db.Decimal(5, 2)
   remarks       String?
+  
+  // Multiple check-in/check-out sessions stored as JSON
+  // Format: [{ checkIn: "2024-11-09T09:00:00Z", checkOut: "2024-11-09T17:00:00Z" }, ...]
+  sessions      Json?
+  
+  // Current status: true if currently checked in (in office), false if checked out
+  currentlyCheckedIn Boolean       @default(false)
+  
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   

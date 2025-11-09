@@ -16,8 +16,8 @@ const Navbar = ({ isSidebarCollapsed, toggleSidebar }) => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // Only fetch attendance for employees
-    if (user?.role !== 'EMPLOYEE') return
+    // Fetch attendance for all users who have employee profiles
+    if (!employee?.id) return
 
     const fetchTodayAttendance = async () => {
       try {
@@ -33,7 +33,7 @@ const Navbar = ({ isSidebarCollapsed, toggleSidebar }) => {
     // Refresh attendance every 30 seconds
     const interval = setInterval(fetchTodayAttendance, 30000)
     return () => clearInterval(interval)
-  }, [user?.role]) // Only re-run when user role changes
+  }, [employee?.id]) // Only re-run when employee profile changes
 
   const handleCheckIn = async () => {
     setLoading(true)
@@ -85,33 +85,21 @@ const Navbar = ({ isSidebarCollapsed, toggleSidebar }) => {
     navigate('/login')
   }
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'PRESENT':
-        return <Circle className="w-3 h-3 fill-green-500 text-green-500" />
-      case 'ON_LEAVE':
-        return <span className="text-blue-500 text-lg">✈️</span>
-      case 'ABSENT':
-        return <Circle className="w-3 h-3 fill-yellow-500 text-yellow-500" />
-      default:
-        return <Circle className="w-3 h-3 fill-gray-400 text-gray-400" />
+  const getStatusIcon = (isCheckedIn) => {
+    if (isCheckedIn) {
+      return <Circle className="w-3 h-3 fill-green-500 text-green-500" />
     }
+    return <Circle className="w-3 h-3 fill-gray-400 text-gray-400" />
   }
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'PRESENT':
-        return 'Present'
-      case 'ON_LEAVE':
-        return 'On Leave'
-      case 'ABSENT':
-        return 'Not Checked In'
-      default:
-        return 'Unknown'
+  const getStatusText = (isCheckedIn) => {
+    if (isCheckedIn) {
+      return 'In Office'
     }
+    return 'Checked Out'
   }
 
-  const currentStatus = todayAttendance?.status || 'ABSENT'
+  const isCurrentlyCheckedIn = todayAttendance?.isCurrentlyInOffice || false
   const canCheckIn = todayAttendance?.canCheckIn
   const canCheckOut = todayAttendance?.canCheckOut
 
@@ -153,20 +141,20 @@ const Navbar = ({ isSidebarCollapsed, toggleSidebar }) => {
             </button>
           </div>
 
-          {/* Attendance Status Badge - Only for Employees */}
-          {user?.role === 'EMPLOYEE' && (
+          {/* Attendance Status Badge - For all users with employee profiles */}
+          {employee?.id && (
             <div className="relative">
               <button
                 onClick={() => setShowAttendanceMenu(!showAttendanceMenu)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200"
                 style={{ 
-                  backgroundColor: currentStatus === 'PRESENT' ? 'var(--color-success-light)' : 'var(--color-warning-light)',
-                  color: currentStatus === 'PRESENT' ? 'var(--color-success)' : '#D97706'
+                  backgroundColor: isCurrentlyCheckedIn ? 'var(--color-success-light)' : 'var(--color-warning-light)',
+                  color: isCurrentlyCheckedIn ? 'var(--color-success)' : '#D97706'
                 }}
               >
-                {getStatusIcon(currentStatus)}
+                {getStatusIcon(isCurrentlyCheckedIn)}
                 <span className="text-sm font-medium">
-                  {getStatusText(currentStatus)}
+                  {getStatusText(isCurrentlyCheckedIn)}
                 </span>
               </button>
 
@@ -179,7 +167,9 @@ const Navbar = ({ isSidebarCollapsed, toggleSidebar }) => {
                   />
                   <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl py-2 z-20 border border-gray-200">
                     <div className="px-4 py-3 border-b border-gray-200">
-                      <p className="text-sm font-semibold text-gray-900">Today's Attendance</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {isCurrentlyCheckedIn ? 'Currently In Office' : 'Currently Checked Out'}
+                      </p>
                       <p className="text-xs mt-1 text-gray-500">
                         {new Date().toLocaleDateString('en-US', { 
                           weekday: 'long', 
@@ -224,10 +214,10 @@ const Navbar = ({ isSidebarCollapsed, toggleSidebar }) => {
                         </div>
                       )}
 
-                      {todayAttendance?.leave && (
-                        <div className="rounded-xl p-3 mt-2 bg-purple-50 border border-[#714B67]/30">
-                          <p className="text-xs text-[#714B67] font-medium">
-                            You are on {todayAttendance.leave.leaveType.replace('_', ' ').toLowerCase()} today
+                      {!isCurrentlyCheckedIn && !canCheckIn && (
+                        <div className="rounded-xl p-3 mt-2 bg-gray-50 border border-gray-200">
+                          <p className="text-xs text-gray-600 font-medium">
+                            Check in to start tracking your work hours
                           </p>
                         </div>
                       )}

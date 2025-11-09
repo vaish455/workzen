@@ -27,6 +27,13 @@ const updateRoleValidation = [
 
 const toggleStatusValidation = [
   body('isActive').isBoolean().withMessage('isActive must be a boolean'),
+  body('deactivationReason')
+    .if(body('isActive').equals('false'))
+    .trim()
+    .notEmpty()
+    .withMessage('Deactivation reason is required when deactivating a user')
+    .isLength({ min: 5, max: 500 })
+    .withMessage('Deactivation reason must be between 5 and 500 characters'),
 ];
 
 // Routes (all require authentication and admin role)

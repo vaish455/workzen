@@ -10,7 +10,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CardGridSkeleton } from '../../components/ui/skeletons'
 
 // Memoized employee card component
-const EmployeeCard = memo(({ emp, onClick }) => {
+const EmployeeCard = memo(({ emp, onClick, isReadOnly }) => {
+  // Determine status indicator
+  const getStatusIndicator = () => {
+    if (emp.onLeave || emp.attendanceStatus === 'ON_LEAVE') {
+      return { icon: '✈️', color: 'text-blue-600', label: 'On Leave' };
+    } else if (emp.isCurrentlyInOffice) {
+      return { icon: '🟢', color: 'text-green-600', label: 'In Office' };
+    } else if (emp.attendanceStatus === 'PRESENT') {
+      return { icon: '🟡', color: 'text-yellow-600', label: 'Checked Out' };
+    } else {
+      return { icon: '🟡', color: 'text-yellow-600', label: 'Absent' };
+    }
+  };
+
+  const status = getStatusIndicator();
+
   return (
     <motion.div
       layout
@@ -18,22 +33,30 @@ const EmployeeCard = memo(({ emp, onClick }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.3 }}
-      onClick={onClick}
-      className="bg-white rounded-xl border border-gray-200 transition-all duration-200 p-8 cursor-pointer hover:shadow-lg hover:border-[#714B67]/20"
+      onClick={isReadOnly ? undefined : onClick}
+      className={`bg-white rounded-xl border border-gray-200 transition-all duration-200 p-8 ${
+        isReadOnly ? '' : 'cursor-pointer hover:shadow-lg hover:border-[#714B67]/20'
+      }`}
     >
       <div className="flex items-start gap-4">
-        {/* Avatar */}
-        {emp.profilePicture ? (
-          <img
-            src={emp.profilePicture}
-            alt={`${emp.firstName} ${emp.lastName}`}
-            className="w-16 h-16 rounded-xl object-cover"
-          />
-        ) : (
-          <div className="w-16 h-16 bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl flex items-center justify-center text-white text-xl font-bold">
-            {emp.firstName?.charAt(0)}{emp.lastName?.charAt(0)}
+        {/* Avatar with Status Badge */}
+        <div className="relative">
+          {emp.profilePicture ? (
+            <img
+              src={emp.profilePicture}
+              alt={`${emp.firstName} ${emp.lastName}`}
+              className="w-16 h-16 rounded-xl object-cover"
+            />
+          ) : (
+            <div className="w-16 h-16 bg-gradient-to-br from-[#714B67] to-[#5A3C52] rounded-xl flex items-center justify-center text-white text-xl font-bold">
+              {emp.firstName?.charAt(0)}{emp.lastName?.charAt(0)}
+            </div>
+          )}
+          {/* Status Badge */}
+          <div className="absolute -top-1 -right-1 text-xl" title={status.label}>
+            {status.icon}
           </div>
-        )}
+        </div>
         
         {/* Employee Info */}
         <div className="flex-1">
@@ -51,6 +74,10 @@ const EmployeeCard = memo(({ emp, onClick }) => {
               <Mail className="w-4 h-4" />
               <span className="truncate">{emp.email}</span>
             </div>
+            {/* Status Label */}
+            {/* <div className={`flex items-center gap-2 text-sm font-medium ${status.color}`}>
+              <span>{status.label}</span>
+            </div> */}
           </div>
         </div>
       </div>
@@ -68,6 +95,9 @@ const EmployeeDirectory = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [viewMode, setViewMode] = useState('grid') // grid or list
+  
+  // Check if user is an employee (read-only mode)
+  const isReadOnly = user?.role === 'EMPLOYEE'
 
   useEffect(() => {
     fetchEmployees()
@@ -93,8 +123,17 @@ const EmployeeDirectory = () => {
     })
 
     // Apply status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(emp => emp.attendanceStatus === statusFilter)
+    if (statusFilter === 'IN_OFFICE') {
+      filtered = filtered.filter(emp => emp.isCurrentlyInOffice)
+    } else if (statusFilter === 'ON_LEAVE') {
+      filtered = filtered.filter(emp => emp.onLeave || emp.attendanceStatus === 'ON_LEAVE')
+    } else if (statusFilter === 'ABSENT') {
+      filtered = filtered.filter(emp => 
+        !emp.isCurrentlyInOffice && 
+        !emp.onLeave && 
+        emp.attendanceStatus !== 'ON_LEAVE' &&
+        emp.attendanceStatus !== 'PRESENT'
+      )
     }
 
     return filtered
@@ -157,24 +196,34 @@ const EmployeeDirectory = () => {
               All
             </button>
             <button
-              onClick={() => setStatusFilter('PRESENT')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                statusFilter === 'PRESENT'
+              onClick={() => setStatusFilter('IN_OFFICE')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1 ${
+                statusFilter === 'IN_OFFICE'
                   ? 'bg-[#714B67] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              PRESENT
+              <span>🟢</span> In Office
             </button>
             <button
               onClick={() => setStatusFilter('ON_LEAVE')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1 ${
                 statusFilter === 'ON_LEAVE'
                   ? 'bg-[#714B67] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              ON LEAVE
+              <span>✈️</span> On Leave
+            </button>
+            <button
+              onClick={() => setStatusFilter('ABSENT')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1 ${
+                statusFilter === 'ABSENT'
+                  ? 'bg-[#714B67] text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <span>🟡</span> Absent
             </button>
           </div>
 
@@ -225,6 +274,7 @@ const EmployeeDirectory = () => {
                 <EmployeeCard 
                   emp={emp}
                   onClick={() => navigate(`/employees/${emp.id}`)}
+                  isReadOnly={isReadOnly}
                 />
               </motion.div>
             ))}
@@ -266,22 +316,33 @@ const EmployeeDirectory = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.03 }}
-                      onClick={() => navigate(`/employees/${emp.id}`)}
-                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={isReadOnly ? undefined : () => navigate(`/employees/${emp.id}`)}
+                      className={isReadOnly ? '' : 'hover:bg-gray-50 transition-colors cursor-pointer'}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          {emp.profilePicture ? (
-                            <img
-                              src={emp.profilePicture}
-                              alt=""
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#714B67] to-[#5A3C52] flex items-center justify-center text-white font-medium text-sm">
-                              {emp.firstName?.charAt(0)}{emp.lastName?.charAt(0)}
+                          <div className="relative">
+                            {emp.profilePicture ? (
+                              <img
+                                src={emp.profilePicture}
+                                alt=""
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#714B67] to-[#5A3C52] flex items-center justify-center text-white font-medium text-sm">
+                                {emp.firstName?.charAt(0)}{emp.lastName?.charAt(0)}
+                              </div>
+                            )}
+                            {/* Status Badge */}
+                            <div className="absolute -top-1 -right-1 text-sm" title={
+                              emp.onLeave || emp.attendanceStatus === 'ON_LEAVE' ? 'On Leave' :
+                              emp.isCurrentlyInOffice ? 'In Office' :
+                              emp.attendanceStatus === 'PRESENT' ? 'Checked Out' : 'Absent'
+                            }>
+                              {emp.onLeave || emp.attendanceStatus === 'ON_LEAVE' ? '✈️' :
+                               emp.isCurrentlyInOffice ? '🟢' : '🟡'}
                             </div>
-                          )}
+                          </div>
                           <div>
                             <p className="font-medium text-gray-900">
                               {emp.firstName} {emp.lastName}
@@ -308,15 +369,25 @@ const EmployeeDirectory = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          emp.todayAttendance?.status === 'PRESENT'
-                            ? 'bg-green-100 text-green-800'
-                            : emp.todayAttendance?.status === 'ON_LEAVE'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {emp.todayAttendance?.status || 'NO RECORD'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">
+                            {emp.onLeave || emp.attendanceStatus === 'ON_LEAVE' ? '✈️' :
+                             emp.isCurrentlyInOffice ? '🟢' : '🟡'}
+                          </span>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            emp.onLeave || emp.attendanceStatus === 'ON_LEAVE'
+                              ? 'bg-blue-100 text-blue-800'
+                              : emp.isCurrentlyInOffice
+                              ? 'bg-green-100 text-green-800'
+                              : emp.attendanceStatus === 'PRESENT'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {emp.onLeave || emp.attendanceStatus === 'ON_LEAVE' ? 'On Leave' :
+                             emp.isCurrentlyInOffice ? 'In Office' :
+                             emp.attendanceStatus === 'PRESENT' ? 'Checked Out' : 'Absent'}
+                          </span>
+                        </div>
                       </td>
                     </motion.tr>
                   ))}
