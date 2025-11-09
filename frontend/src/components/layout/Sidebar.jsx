@@ -27,7 +27,7 @@ const Sidebar = ({ isCollapsed }) => {
         name: 'Employees',
         path: '/employees',
         icon: Users,
-        roles: ['ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER', 'EMPLOYEE'],
+        roles: ['ADMIN', 'HR_OFFICER', 'PAYROLL_OFFICER'],
       },
     ]
 
